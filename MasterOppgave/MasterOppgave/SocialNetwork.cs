@@ -8,17 +8,17 @@ namespace MasterOppgave
 {
     class SocialNetwork
     {
-        private Dictionary<Agent, List<Tuple<Agent, float>>> socialNetwork;
+        private Dictionary<Agent, List<Tuple<Agent, double>>> socialNetwork;
 
         public SocialNetwork()
         {
-            socialNetwork = new Dictionary<Agent, List<Tuple<Agent, float>>>();
+            socialNetwork = new Dictionary<Agent, List<Tuple<Agent, double>>>();
         }
 
         //-- getters and setters --//
-        public List<Tuple<Agent, float>> getAgentsConnections(Agent agent)
+        public List<Tuple<Agent, double>> getAgentsConnections(Agent agent)
         {
-            foreach(KeyValuePair<Agent, List<Tuple<Agent, float>>> i in socialNetwork)
+            foreach(KeyValuePair<Agent, List<Tuple<Agent, double>>> i in socialNetwork)
             {
                 if (i.Key.Equals(agent))
                 {
@@ -28,13 +28,13 @@ namespace MasterOppgave
             return null;
         }
 
-        public float getConnection(Agent a, Agent b)
+        public double getConnection(Agent a, Agent b)
         {
-            foreach(KeyValuePair<Agent, List<Tuple<Agent, float>>> i in socialNetwork)
+            foreach(KeyValuePair<Agent, List<Tuple<Agent, double>>> i in socialNetwork)
             {
                 if (i.Key.Equals(a))
                 {
-                    foreach(Tuple<Agent, float> j in i.Value)
+                    foreach(Tuple<Agent, double> j in i.Value)
                     {
                         if (j.Item1.Equals(b))
                         {
@@ -46,32 +46,32 @@ namespace MasterOppgave
             return 0;
         }
 
-        public void setConnection(Agent a, Agent b, float connection)
+        public void setConnection(Agent a, Agent b, double connection)
         {
-            foreach (KeyValuePair<Agent, List<Tuple<Agent, float>>> i in socialNetwork)
+            foreach (KeyValuePair<Agent, List<Tuple<Agent, double>>> i in socialNetwork)
             {
                 if (i.Key.Equals(a))
                 {
-                    //foreach (Tuple<Agent, float> j in i.Value)
+                    //foreach (Tuple<Agent, double> j in i.Value)
                     for (int j = 0; j < i.Value.Count(); j++)
                     {
                         if (i.Value[j].Item1.Equals(b))
                         {
                             // a og b har connection og den kan oppdateres
-                            socialNetwork[a][j] = new Tuple<Agent, float>(b, connection);
+                            socialNetwork[a][j] = new Tuple<Agent, double>(b, connection);
                         }
                         else
                         {
                             // a og b har ikke connection og den opprettes
-                            socialNetwork[a].Add(new Tuple<Agent, float>(b, connection));
+                            socialNetwork[a].Add(new Tuple<Agent, double>(b, connection));
                         }
                     }
                 }
                 else
                 {
                     // Legge inn agent a i nettverk
-                    Tuple<Agent, float> tempTuple = new Tuple<Agent, float>(b, connection);
-                    List<Tuple<Agent, float>> tempList = new List<Tuple<Agent, float>>();
+                    Tuple<Agent, double> tempTuple = new Tuple<Agent, double>(b, connection);
+                    List<Tuple<Agent, double>> tempList = new List<Tuple<Agent, double>>();
                     tempList.Add(tempTuple);
                     socialNetwork.Add(a, tempList);
                 }

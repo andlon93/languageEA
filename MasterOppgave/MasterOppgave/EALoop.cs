@@ -9,12 +9,11 @@ namespace MasterOppgave
     class EALoop
     {
         public SocialNetwork socialNetwork;
-        private int populationSize;
+        public static int populationSize = 100;
 
-        public EALoop(int populationSize)
+        public EALoop()
         {
             socialNetwork = new SocialNetwork();
-            this.populationSize = populationSize;
         }
 
         static void Main(string[] args)

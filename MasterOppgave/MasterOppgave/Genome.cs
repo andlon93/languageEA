@@ -47,13 +47,8 @@ namespace MasterOppgave
         }
 
         //-- getters and setters --//
-        public List<double> getNormalisedGenome()
-        {
-            return genomeNormalised;
-        }
-        public List<double> getValuesGenome()
-        {
-            return genomeValues  ;
-        }
+        public List<double> getNormalisedGenome(){return genomeNormalised;}
+        public List<double> getValuesGenome(){return genomeValues;}
+        
     }
 }
