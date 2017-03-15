@@ -14,7 +14,18 @@ namespace MasterOppgave
         public Genome(List<double> genome)
         {
             genomeValues = genome;
+            genomeNormalised = normalise(genomeValues);
+        }
+        public Genome()
+        {
+            Random rng = new Random();
+            genomeValues = new List<double>();
+            for(int i=0; i<10; i++)
+            {
+                genomeValues.Add(rng.Next(0, 100));
+            }
 
+            genomeNormalised = normalise(genomeValues);
         }
 
         public List<double> normalise(List<double> genome)
@@ -33,6 +44,16 @@ namespace MasterOppgave
                 int index = rng.Next(genomeValues.Count);
                 genomeValues[index] *= mutateRate;
             }
+        }
+
+        //-- getters and setters --//
+        public List<double> getNormalisedGenome()
+        {
+            return genomeNormalised;
+        }
+        public List<double> getValuesGenome()
+        {
+            return genomeValues;
         }
     }
 }
