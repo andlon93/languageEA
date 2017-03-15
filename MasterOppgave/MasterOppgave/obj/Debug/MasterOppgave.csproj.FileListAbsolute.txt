@@ -1,1 +1,2 @@
 C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\bin\Debug\MasterOppgave.exe.config
+C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\obj\Debug\MasterOppgave.csprojResolveAssemblyReference.cache
