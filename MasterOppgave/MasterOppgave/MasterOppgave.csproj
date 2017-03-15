@@ -37,6 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="EALoop.cs" />
+    <Compile Include="Genome.cs" />
     <Compile Include="SocialNetwork.cs" />
   </ItemGroup>
   <ItemGroup>

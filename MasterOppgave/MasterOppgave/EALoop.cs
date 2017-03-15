@@ -8,5 +8,17 @@ namespace MasterOppgave
 {
     class EALoop
     {
+        public SocialNetwork socialNetwork;
+
+        public EALoop()
+        {
+            socialNetwork = new SocialNetwork();
+        }
+
+        static void Main(string[] args)
+        {
+            System.Console.WriteLine("Starting");
+            
+        }
     }
 }
