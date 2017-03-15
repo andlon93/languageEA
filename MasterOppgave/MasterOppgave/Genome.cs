@@ -53,7 +53,7 @@ namespace MasterOppgave
         }
         public List<double> getValuesGenome()
         {
-            return genomeValues;
+            return genomeValues  ;
         }
     }
 }
