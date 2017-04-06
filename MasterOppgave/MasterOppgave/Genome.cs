@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MasterOppgave
 {
@@ -24,14 +22,16 @@ namespace MasterOppgave
         private List<double> genomeValues;
         private List<double> genomeNormalised;
 
-        public Genome(List<double> genome)
+        public Genome(List<double> genome, double p)
         {
             genomeValues = genome;
+            mutate(p);
             genomeNormalised = new List<double>(10);
         }
         public Genome()
         {
-            // TODO: verdier skal ha et forhold til hverandre
+            genomeNormalised = new List<double>(10);
+
             Random rng = new Random();
             genomeValues = new List<double>(10);
             int n = 20;
@@ -65,6 +65,7 @@ namespace MasterOppgave
                 double mutateRate = (rng.Next(4) - 2) / 10; // Blir et tall mellom -0.2 og 0.2
                 int index = rng.Next(genomeValues.Count);
                 genomeValues[index] *= mutateRate;
+                normalise(genomeValues);
             }
         }
 
