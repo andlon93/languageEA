@@ -8,6 +8,17 @@ namespace MasterOppgave
 {
     class Genome
     {
+        //     VAUE         INDEX  
+        // Self direcion  =   0
+        // Stimulation    =   1
+        // Hedonism       =   2
+        // Achievement    =   3
+        // Power          =   4
+        // Security       =   5
+        // Conformity     =   6
+        // Tradition      =   7
+        // Benevolence    =   8
+        // Univarsalism   =   9
         private List<double> genomeValues;
         private List<double> genomeNormalised;
 
@@ -18,6 +29,7 @@ namespace MasterOppgave
         }
         public Genome()
         {
+            // TODO: verdier skal ha et forhold til hverandre
             Random rng = new Random();
             genomeValues = new List<double>();
             for(int i=0; i<10; i++)
@@ -30,9 +42,9 @@ namespace MasterOppgave
 
         public List<double> normalise(List<double> genome)
         {
-            List<double> normalised = genome.Select(i => i * (100.0/genome.Max()) ).ToList();
-            return normalised;
-            // return genome.Select(i => i * (100.0/genome.Max()) ).ToList();
+            //List<double> normalised = genome.Select(i => i * (100.0/genome.Max()) ).ToList();
+            //return normalised;
+            return genome.Select(i => i * (100.0/genome.Max()) ).ToList();
         }
 
         public void mutate(double p)
