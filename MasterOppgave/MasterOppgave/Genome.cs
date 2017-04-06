@@ -22,10 +22,10 @@ namespace MasterOppgave
         private List<double> genomeValues;
         private List<double> genomeNormalised;
 
-        public Genome(List<double> genome, double p)
+        public Genome(List<double> genome)
         {
             genomeValues = genome;
-            mutate(p);
+            mutate(EALoop.mutationProb);
             genomeNormalised = new List<double>(10);
         }
         public Genome()

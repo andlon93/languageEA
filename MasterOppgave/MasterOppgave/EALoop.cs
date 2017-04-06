@@ -10,6 +10,7 @@ namespace MasterOppgave
     {
         public SocialNetwork socialNetwork;
         public static int populationSize = 100;
+        public static Double mutationProb = 0.05;
 
         public EALoop()
         {
