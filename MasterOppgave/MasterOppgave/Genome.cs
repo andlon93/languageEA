@@ -45,7 +45,7 @@ namespace MasterOppgave
             genomeValues[3] = rng.Next(0, 100); // Random value
             genomeValues[4] = genomeValues[3] * (rng.Next(0, n) / 100); // Close to value #3
             genomeValues[8] = (100 - genomeValues[4]) * (rng.Next(0, n) / 100); // Opposite of #4
-            genomeValues[9] = genomeValues[8] * (rng.Next(0, n) / 100);
+            genomeValues[9] = genomeValues[8] * (rng.Next(0, n) / 100); // Close to value 8
             
             genomeValues[2] = (genomeValues[1]+genomeValues[3] / 2) * (rng.Next(0, n/2) / 100); // Close to #3 and #1
 
