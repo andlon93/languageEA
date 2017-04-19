@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MasterOppgave
+namespace LanguageEvolution
 {
-    class EALoop
+    public class EALoop
     {
         public SocialNetwork socialNetwork;
         public static int populationSize = 100;

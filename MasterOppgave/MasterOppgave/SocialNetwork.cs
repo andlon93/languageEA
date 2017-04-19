@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MasterOppgave
+namespace LanguageEvolution
 {
-    class SocialNetwork
+    public class SocialNetwork
     {
         private Dictionary<Agent, List<Tuple<Agent, double>>> socialNetwork;
 

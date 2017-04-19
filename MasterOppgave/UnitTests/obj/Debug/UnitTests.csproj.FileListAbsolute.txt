@@ -1,0 +1,8 @@
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\obj\Debug\UnitTests.csprojResolveAssemblyReference.cache
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\bin\Debug\UnitTests.dll
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\bin\Debug\UnitTests.pdb
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\bin\Debug\MasterOppgave.exe
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\bin\Debug\MasterOppgave.pdb
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\obj\Debug\UnitTests.dll
+C:\Users\andrl\Kode\languageEA\MasterOppgave\UnitTests\obj\Debug\UnitTests.pdb

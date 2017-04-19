@@ -4,18 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MasterOppgave
+namespace LanguageEvolution
 {
-    class Agent
+    public class Agent
     {
-        private double fitness;
-        private Genome genome;
-        private List<Tuple<Agent, double>> connections;
-        private int age;
+        // Genome har genotype og phenotype
+        //private double fitness;
+        //private Genome genome;
+        //private List<Tuple<Agent, double>> connections;
+        //private int age;
+        public double fitness;
+        public Genome genome;
+        public List<Tuple<Agent, double>> connections;
+        public int age;
 
         public Agent(List<double> genomeValues, List<Tuple<Agent, double>> connections)
         {
-            this.genome = new Genome(genomeValues);
+            genome = new Genome(genomeValues);
             this.connections = connections;
             age = 0;
         }
@@ -24,14 +29,16 @@ namespace MasterOppgave
         {
             double fitness = 0;
 
-            double wMax = 1.0;
+            double wMax = 0.0;
             double numConnections = connections.Count;
             double N = EALoop.populationSize;
             double sumOfAllWeights = 0;
             double sumOfStrongWeights = 0;
             foreach(Tuple<Agent, double> i in connections){
-                sumOfAllWeights += i.Item2;
-                if(i.Item2 > 0.1) { sumOfStrongWeights += i.Item2; }
+                double weight = i.Item2;
+                sumOfAllWeights += weight;
+                if (wMax < weight) { wMax = weight; }
+                if(weight > 0.1) { sumOfStrongWeights += weight; }
             }
 
             fitness = (sumOfAllWeights/(wMax*numConnections)) * (sumOfStrongWeights/(N-1)) * Math.Exp(-0.05*getAge());
