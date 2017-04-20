@@ -23,26 +23,35 @@ namespace LanguageEvolution
             genome = new Genome(genomeValues);
             this.connections = connections;
             age = 0;
+            fitness = calculateFitness();
         }
 
-        public void calculateFitness()
+        public Agent()
         {
-            double fitness = 0;
+            genome = new Genome();
+            connections = new List<Tuple<Agent, double>>();
+            age = 0;
+            fitness = calculateFitness();
+        }
+
+        public double calculateFitness()
+        {
+            if(connections.Count == 0) { return 0; }
 
             double wMax = 0.0;
             double numConnections = connections.Count;
             double N = EALoop.populationSize;
             double sumOfAllWeights = 0;
-            double sumOfStrongWeights = 0;
-            foreach(Tuple<Agent, double> i in connections){
+            double NStrongWeights = 0;
+
+            foreach (Tuple<Agent, double> i in connections){
                 double weight = i.Item2;
                 sumOfAllWeights += weight;
                 if (wMax < weight) { wMax = weight; }
-                if(weight > 0.1) { sumOfStrongWeights += weight; }
+                if(weight > 0.5) { NStrongWeights += 1; }
             }
 
-            fitness = (sumOfAllWeights/(wMax*numConnections)) * (sumOfStrongWeights/(N-1)) * Math.Exp(-0.05*getAge());
-            setFitness(fitness);
+            return (sumOfAllWeights/(wMax*numConnections)) * (NStrongWeights / (N-1)) * Math.Exp(-0.05*getAge());
         }
 
         //-- getters and setters --//
