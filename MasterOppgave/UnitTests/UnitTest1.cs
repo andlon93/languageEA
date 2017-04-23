@@ -77,7 +77,30 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void survivalSelectionTest()
+        {
+            EALoop ea = new EALoop();
+            Agent a1 = new Agent(); a1.setFitness(10);
+            Agent a2 = new Agent(); a2.setFitness(11);
+            Agent a3 = new Agent(); a3.setFitness(2);
+            Agent a4 = new Agent(); a4.setFitness(12);
+            List<Agent> pop = new List<Agent>() { a1, a2, a3, a4 };
+            List<Agent> survived = new List<Agent>();
+            survived = ea.survivalSelection(2, pop);
 
+            //System.Diagnostics.Debug.WriteLine(survived[0].getFitness());
+            //System.Diagnostics.Debug.WriteLine(survived[1].getFitness());
+            Assert.AreEqual(2, survived.Count);
+            Assert.AreEqual(11, survived[0].getFitness());
+            Assert.AreEqual(12, survived[1].getFitness());
+        }
+
+        [TestMethod]
+        public void socialNetworkTest()
+        {
+
+        }
     }
 }
    

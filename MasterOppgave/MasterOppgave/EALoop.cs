@@ -23,10 +23,10 @@ namespace LanguageEvolution
             
         }
 
-        private List<Agent> survivalSelection(int populationSize, List<Agent> population)
+        public List<Agent> survivalSelection(int populationSize, List<Agent> population)
         {
             List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
-            sortedList.RemoveRange(populationSize, sortedList.Count-populationSize);
+            sortedList.RemoveRange(0, populationSize);
             return sortedList;
         }
 
