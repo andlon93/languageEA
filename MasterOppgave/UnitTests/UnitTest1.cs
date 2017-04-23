@@ -125,11 +125,25 @@ namespace UnitTests
             net.setConnection(a, b, 2);
             net.setConnection(a1, b2, 3);
             net.setConnection(a, a1, 4);
+
+            Assert.AreEqual(net.socialNetwork[a], net.getAgentsConnections(a));
+            Assert.AreEqual(2, net.getAgentsConnections(a).Count);
         }
         [TestMethod]
         public void getConnectionSocialNetworkTest()
         {
-            
+            SocialNetwork net = new SocialNetwork();
+            Agent a = new Agent();
+            Agent b = new Agent();
+            Agent a1 = new Agent();
+            Agent b2 = new Agent();
+            net.setConnection(a, b, 2);
+            net.setConnection(a1, b2, 3);
+            net.setConnection(a, a1, 4);
+
+            Assert.AreEqual(2, net.getConnection(a, b));
+            Assert.AreEqual(3, net.getConnection(a1, b2));
+            Assert.AreEqual(4, net.getConnection(a, a1));
         }
     }
 }

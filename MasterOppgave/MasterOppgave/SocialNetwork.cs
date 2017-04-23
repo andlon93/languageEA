@@ -20,7 +20,7 @@ namespace LanguageEvolution
         //-- getters and setters --//
         public List<Tuple<Agent, double>> getAgentsConnections(Agent agent)
         {
-            foreach(KeyValuePair<Agent, List<Tuple<Agent, double>>> i in socialNetwork)
+            foreach(var i in socialNetwork)
             {
                 if (i.Key.Equals(agent))
                 {
