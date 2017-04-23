@@ -6,11 +6,15 @@ namespace LanguageEvolution
 {
     public class SocialNetwork
     {
-        private Dictionary<Agent, List<Tuple<Agent, double>>> socialNetwork;
+        public Dictionary<Agent, List<Tuple<Agent, double>>> socialNetwork;
 
         public SocialNetwork()
         {
             socialNetwork = new Dictionary<Agent, List<Tuple<Agent, double>>>();
+        }
+        public SocialNetwork(Dictionary<Agent, List<Tuple<Agent, double>>> network)
+        {
+            socialNetwork = network;
         }
 
         //-- getters and setters --//
@@ -46,33 +50,26 @@ namespace LanguageEvolution
 
         public void setConnection(Agent a, Agent b, double connection)
         {
-            foreach (KeyValuePair<Agent, List<Tuple<Agent, double>>> i in socialNetwork)
+            if(socialNetwork.ContainsKey(a))
             {
-                if (i.Key.Equals(a))
+                foreach (var i in socialNetwork[a].ToArray())
                 {
-                    //foreach (Tuple<Agent, double> j in i.Value)
-                    for (int j = 0; j < i.Value.Count(); j++)
+                    int counter = 0;
+                    if (i.Item1.Equals(b))
                     {
-                        if (i.Value[j].Item1.Equals(b))
-                        {
-                            // a og b har connection og den kan oppdateres
-                            socialNetwork[a][j] = new Tuple<Agent, double>(b, connection);
-                        }
-                        else
-                        {
-                            // a og b har ikke connection og den opprettes
-                            socialNetwork[a].Add(new Tuple<Agent, double>(b, connection));
-                        }
+                        socialNetwork[a][counter] = new Tuple<Agent, double>(b, connection);
                     }
+                    counter++;
                 }
-                else
-                {
-                    // Legge inn agent a i nettverk
-                    Tuple<Agent, double> tempTuple = new Tuple<Agent, double>(b, connection);
-                    List<Tuple<Agent, double>> tempList = new List<Tuple<Agent, double>>();
-                    tempList.Add(tempTuple);
-                    socialNetwork.Add(a, tempList);
-                }
+                socialNetwork[a].Add(new Tuple<Agent, double>(b, connection));
+            }
+            else
+            {
+                //Legge inn agent a i nettverk
+                Tuple<Agent, double> tempTuple = new Tuple<Agent, double>(b, connection);
+                List<Tuple<Agent, double>> tempList = new List<Tuple<Agent, double>>();
+                tempList.Add(tempTuple);
+                socialNetwork.Add(a, tempList);
             }
         }
     }
