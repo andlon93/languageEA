@@ -17,6 +17,7 @@ namespace LanguageEvolution
         public Genome genome;
         public List<Tuple<Agent, double>> connections;
         public int age;
+        public Vocabulary vocabulary;
 
         public Agent(List<double> genomeValues, List<Tuple<Agent, double>> connections)
         {
@@ -30,6 +31,7 @@ namespace LanguageEvolution
         {
             genome = new Genome();
             connections = new List<Tuple<Agent, double>>();
+            vocabulary = new Vocabulary();
             age = 0;
             fitness = calculateFitness();
         }
@@ -59,5 +61,9 @@ namespace LanguageEvolution
         public double getFitness(){return fitness;}
         public int getAge() { return age;}
         public void incrementAge() { age++; }
+        public Vocabulary getVocabulary()
+        {
+            return vocabulary;
+        }
     }
 }

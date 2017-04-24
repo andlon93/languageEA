@@ -40,6 +40,7 @@
     <Compile Include="EALoop.cs" />
     <Compile Include="Genome.cs" />
     <Compile Include="SocialNetwork.cs" />
+    <Compile Include="Vocabulary.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

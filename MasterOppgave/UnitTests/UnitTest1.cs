@@ -114,6 +114,7 @@ namespace UnitTests
 
 
         }
+
         [TestMethod]
         public void getAgentsConnectionsSocialNetworkTest()
         {
@@ -129,6 +130,7 @@ namespace UnitTests
             Assert.AreEqual(net.socialNetwork[a], net.getAgentsConnections(a));
             Assert.AreEqual(2, net.getAgentsConnections(a).Count);
         }
+
         [TestMethod]
         public void getConnectionSocialNetworkTest()
         {
@@ -144,6 +146,26 @@ namespace UnitTests
             Assert.AreEqual(2, net.getConnection(a, b));
             Assert.AreEqual(3, net.getConnection(a1, b2));
             Assert.AreEqual(4, net.getConnection(a, a1));
+        }
+
+        [TestMethod]
+        public void vocabularyTest()
+        {
+            Agent a = new Agent();
+
+            a.getVocabulary().updateVocabulary("s", 1);
+            Assert.AreEqual(1, a.getVocabulary().getVocabulary().Count);
+            Assert.AreEqual("s", a.getVocabulary().getVocabulary()[0].Item1);
+
+            a.getVocabulary().updateVocabulary("t", 2);
+            a.getVocabulary().updateVocabulary("u", 0);
+            Assert.AreEqual(3, a.getVocabulary().getVocabulary().Count);
+            Assert.AreEqual("u", a.getVocabulary().getVocabulary()[0].Item1);
+
+            a.getVocabulary().updateVocabulary("u", 3);            
+            Assert.AreEqual("u", a.getVocabulary().getVocabulary()[2].Item1);
+            Assert.AreEqual(3, a.getVocabulary().getVocabulary()[2].Item2);
+            Assert.AreEqual("s", a.getVocabulary().getVocabulary()[0].Item1);
         }
     }
 }
