@@ -63,17 +63,16 @@ namespace UnitTests
         {
             EALoop ea = new EALoop();
 
-            Tuple<Agent, double> a1 = new Tuple<Agent, double>(new Agent(), 10);
-            Tuple<Agent, double> a2 = new Tuple<Agent, double>(new Agent(), 1);
-            Tuple<Agent, double> a3 = new Tuple<Agent, double>(new Agent(), 1);
-            Tuple<Agent, double> a4 = new Tuple<Agent, double>(new Agent(), 1);
-            Tuple<Agent, double> a5 = new Tuple<Agent, double>(new Agent(), 2);
-
-            List<double> genome = new List<double>() { 10, 45, 65, 97, 31, 56, 97, 14, 85, 53 };
-            List<Tuple<Agent, double>> connections = new List<Tuple<Agent, double>>() { a1, a2, a3, a4, a5 };
-            Agent agent = new Agent(genome, connections);
+            Agent agent = new Agent();
+            ea.socialNetwork.setConnection(agent, new Agent(), 10);
+            ea.socialNetwork.setConnection(agent, new Agent(), 1);
+            ea.socialNetwork.setConnection(agent, new Agent(), 1);
+            ea.socialNetwork.setConnection(agent, new Agent(), 1);
+            ea.socialNetwork.setConnection(agent, new Agent(), 1);
+            ea.socialNetwork.setConnection(agent, new Agent(), 1);
             while (agent.getAge() < 2) { agent.incrementAge(); }
-            Assert.AreEqual(0.1233869206412672, agent.calculateFitness());
+
+            Assert.AreEqual(0.1233869206412672, agent.calculateFitness(ea.socialNetwork.getAgentsConnections(agent)));
 
         }
 
@@ -166,6 +165,53 @@ namespace UnitTests
             Assert.AreEqual("u", a.getVocabulary().getVocabulary()[2].Item1);
             Assert.AreEqual(3, a.getVocabulary().getVocabulary()[2].Item2);
             Assert.AreEqual("s", a.getVocabulary().getVocabulary()[0].Item1);
+        }
+
+        [TestMethod]
+        public void testSelectSpeaker()
+        {
+            Dialogue d = new Dialogue();
+            Agent a = new Agent();                     
+            Agent b = new Agent();
+            Agent c = new Agent();
+            List<Agent> agent = new List<Agent>() { a };
+            List<Agent> agents = new List<Agent>() { a, b, c };
+
+            Assert.AreEqual(a, d.selectSpeaker(agent));
+
+            if (agents.Contains(d.selectSpeaker(agents)))
+                Assert.AreEqual(1, 1);
+            else
+                Assert.AreNotEqual(1, 1);
+        }
+
+        [TestMethod]
+        public void testSelectListener()
+        {
+            //List<double> genomeExtro = new List<double>() { 0, 0, 0, 100, 100, 0, 0, 0, 0, 0 };
+            Agent a = new Agent();
+            Agent b = new Agent();
+            Agent c = new Agent();
+            Agent d = new Agent();
+            Agent e = new Agent();
+            Agent f = new Agent();
+            SocialNetwork net = new SocialNetwork();
+            net.setConnection(a, b, 1);
+            net.setConnection(a, c, 0);
+            net.setConnection(b, d, 1);
+            net.setConnection(c, e, 1);
+            net.setConnection(e, f, 1);
+            net.setConnection(d, f, 1);
+            //a.setConnections(net.getAgentsConnections(a));
+
+            Dialogue dia = new Dialogue();
+            dia.C = 0.0;
+            Agent listenerIntrovert = dia.selectListener(a, net);
+            dia.C = 1.0;
+            Agent listenerExtrovert = dia.selectListener(a, net);
+
+            Assert.AreEqual(b, listenerIntrovert);
+            Assert.AreEqual(f, listenerExtrovert);
         }
     }
 }
