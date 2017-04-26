@@ -57,15 +57,17 @@ namespace LanguageEvolution
                     int counter = 0;
                     if (i.Item1.Equals(b))
                     {
+                        // Update existing connection
                         socialNetwork[a][counter] = new Tuple<Agent, double>(b, connection);
                     }
                     counter++;
                 }
+                // Add new connection
                 socialNetwork[a].Add(new Tuple<Agent, double>(b, connection));
             }
             else
             {
-                //Legge inn agent a i nettverk
+                // Add new agent to the network
                 Tuple<Agent, double> tempTuple = new Tuple<Agent, double>(b, connection);
                 List<Tuple<Agent, double>> tempList = new List<Tuple<Agent, double>>();
                 tempList.Add(tempTuple);

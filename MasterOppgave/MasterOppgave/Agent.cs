@@ -22,7 +22,7 @@ namespace LanguageEvolution
         {
             genome = new Genome(genomeValues);
             //connections = new List<Tuple<Agent, double>>();
-            age = 0;
+            age = 1;
         }
         //public Agent(List<double> genomeValues, List<Tuple<Agent, double>> connections)
         //{
@@ -37,7 +37,7 @@ namespace LanguageEvolution
             genome = new Genome();
             //connections = new List<Tuple<Agent, double>>();
             vocabulary = new Vocabulary();
-            age = 0;
+            age = 1;
         }
 
         public double calculateFitness(List<Tuple<Agent, double>> connections)
@@ -58,6 +58,19 @@ namespace LanguageEvolution
             }
 
             return (sumOfAllWeights/(wMax*numConnections)) * (NStrongWeights / (N-1)) * Math.Exp(-0.05*getAge());
+        }
+
+        public void updatepersonality(Agent partner, bool isSuccess)
+        {
+            if(isSuccess)
+            {
+                List<double> values = this.getGenome().getValuesGenome();
+                List<double> partnerValues = partner.getGenome().getValuesGenome();
+                for (int i = 0; i < values.Count; i++)
+                {
+                    values[i] += (( (partnerValues[i] - values[i]) / this.getAge() ) * 0.5);
+                }
+            }
         }
 
         //-- getters and setters --//

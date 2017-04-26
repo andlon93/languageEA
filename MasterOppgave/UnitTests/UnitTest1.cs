@@ -104,14 +104,17 @@ namespace UnitTests
             Agent a1 = new Agent();
             Agent b2 = new Agent();
 
-            net.setConnection(a, b, 2);
+            net.setConnection(a, b, 2); // legge til ny agent.
             Assert.AreEqual(1, net.socialNetwork.Count);
-            net.setConnection(a1, b2, 3);
+
+            net.setConnection(a1, b2, 3); // ny agent #2.
             Assert.AreEqual(2, net.socialNetwork.Count);
-            net.setConnection(a, a1, 4);
+
+            net.setConnection(a, a1, 4); // ny connection for eksisterende agent.
             Assert.AreEqual(2, net.socialNetwork[a].Count);
 
-
+            net.setConnection(a, b, 10);
+            Assert.AreEqual(10, net.socialNetwork[a][0].Item2);
         }
 
         [TestMethod]
@@ -212,6 +215,24 @@ namespace UnitTests
 
             Assert.AreEqual(b, listenerIntrovert);
             Assert.AreEqual(f, listenerExtrovert);
+        }
+
+        [TestMethod]
+        public void testUpdatePersonality()
+        {
+            List<double> genome = new List<double>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            List<double> genome2 = new List<double>() { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
+            Agent a = new Agent(genome);
+            Agent b = new Agent(genome2);
+
+            a.updatepersonality(b, false);
+            Assert.AreEqual(1, a.getGenome().getValuesGenome()[0]);
+
+            a.updatepersonality(b, true);
+            b.updatepersonality(a, true);
+
+            Assert.AreEqual(1.75, b.getGenome().getValuesGenome()[0]);
+            Assert.AreEqual(1.5, a.getGenome().getValuesGenome()[0]);
         }
     }
 }
