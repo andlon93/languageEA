@@ -68,6 +68,25 @@ namespace LanguageEvolution
             return b;
         }
 
+        public Agent crossover(Agent a, Agent b)
+        {
+            List<double> childGenome = new List<double>();
+            List<double> aGenome = a.getGenome().getValuesGenome();
+            List<double> bGenome = b.getGenome().getValuesGenome();
+            childGenome.Add(aGenome[0]);
+            childGenome.Add(aGenome[1]);
+            childGenome.Add(bGenome[2]);
+            childGenome.Add(bGenome[3]);
+            childGenome.Add(bGenome[4]);
+            childGenome.Add(aGenome[5]);
+            childGenome.Add(aGenome[6]);
+            childGenome.Add(aGenome[7]);
+            childGenome.Add(bGenome[8]);
+            childGenome.Add(bGenome[9]);
+
+            return new Agent(childGenome);
+        }
+        
         //-- getters and setters --//
         public int getPopulationSize()
         {

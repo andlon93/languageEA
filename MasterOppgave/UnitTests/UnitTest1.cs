@@ -269,7 +269,7 @@ namespace UnitTests
                     e_count++;
                 else if (fitness == 100)
                     error++;
-                System.Threading.Thread.Sleep(2);
+                System.Threading.Thread.Sleep(1);
             }
             System.Diagnostics.Debug.WriteLine("\n\n"+N+ " tournaments run with p as "+ (1-eps));
             System.Diagnostics.Debug.WriteLine("A: "+ (a_count/N)*100);
@@ -280,6 +280,21 @@ namespace UnitTests
             System.Diagnostics.Debug.WriteLine("errors: "+ (error / N) * 100);
             Assert.AreEqual(0.0, error);
         }
+
+        [TestMethod]
+        public void testCrossover()
+        {
+            EALoop ea = new EALoop();
+            Agent parent1 = new Agent(new List<double>() { 0, 1, 10, 10, 10, 5, 6, 7, 10, 10 });
+            Agent parent2 = new Agent(new List<double>() { 10, 10, 2, 3, 4, 10, 10, 10, 8, 9 });
+            Agent child = ea.crossover(parent1, parent2);
+            Agent child2 = ea.crossover(parent2, parent1);
+            for(int i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(10, child2.getGenome().getValuesGenome()[i]);
+                Assert.AreEqual(i, child.getGenome().getValuesGenome()[i]);
+            }
+        }    
     }
 }
    

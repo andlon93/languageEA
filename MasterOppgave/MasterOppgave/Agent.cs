@@ -21,15 +21,14 @@ namespace LanguageEvolution
         public Agent(List<double> genomeValues)
         {
             genome = new Genome(genomeValues);
-            //connections = new List<Tuple<Agent, double>>();
+            vocabulary = new Vocabulary();
             age = 1;
         }
         //public Agent(List<double> genomeValues, List<Tuple<Agent, double>> connections)
         //{
         //    genome = new Genome(genomeValues);
         //    this.connections = connections;
-        //    age = 0;
-        //    fitness = calculateFitness();
+        //    age = 1;
         //}
 
         public Agent()
