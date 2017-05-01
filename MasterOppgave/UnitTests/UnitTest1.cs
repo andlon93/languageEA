@@ -234,6 +234,52 @@ namespace UnitTests
             Assert.AreEqual(1.75, b.getGenome().getValuesGenome()[0]);
             Assert.AreEqual(1.5, a.getGenome().getValuesGenome()[0]);
         }
+
+        [TestMethod]
+        public void testTournamentSelection()
+        {
+            int k = 5;
+            double eps = 0.2;
+            EALoop ea = new EALoop();
+            Agent a = new Agent(); a.fitness = 5;
+            Agent b = new Agent(); b.fitness = 4;
+            Agent c = new Agent(); c.fitness = 3;
+            Agent d = new Agent(); d.fitness = 2;
+            Agent e = new Agent(); e.fitness = 1;
+            List<Agent> allAgents = new List<Agent>() { a, e, b, d, c};
+
+            ea.k = k;
+            ea.eps = eps;
+
+            double a_count = 0; double b_count = 0; double c_count = 0; double d_count = 0; double e_count = 0; double error = 0;
+            double N = 100;
+            
+            for (int i = 0; i < N; i++)
+            {
+                double fitness = ea.tournamentSelection(allAgents).getFitness();
+                if (fitness == 5)
+                    a_count++;
+                else if (fitness == 4)
+                    b_count++;
+                else if (fitness == 3)
+                    c_count++;
+                else if (fitness == 2)
+                    d_count++;
+                else if (fitness == 1)
+                    e_count++;
+                else if (fitness == 100)
+                    error++;
+                System.Threading.Thread.Sleep(2);
+            }
+            System.Diagnostics.Debug.WriteLine("\n\n"+N+ " tournaments run with p as "+ (1-eps));
+            System.Diagnostics.Debug.WriteLine("A: "+ (a_count/N)*100);
+            System.Diagnostics.Debug.WriteLine("B: "+ (b_count / N) * 100);
+            System.Diagnostics.Debug.WriteLine("C: "+ (c_count / N) * 100);
+            System.Diagnostics.Debug.WriteLine("D: " + (d_count / N) * 100);
+            System.Diagnostics.Debug.WriteLine("E: " + (e_count / N) * 100);
+            System.Diagnostics.Debug.WriteLine("errors: "+ (error / N) * 100);
+            Assert.AreEqual(0.0, error);
+        }
     }
 }
    
