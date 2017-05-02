@@ -114,7 +114,7 @@ namespace UnitTests
             Assert.AreEqual(2, net.socialNetwork[a].Count);
 
             net.setConnection(a, b, 10);
-            Assert.AreEqual(10, net.socialNetwork[a][0].Item2);
+            Assert.AreEqual(10, net.socialNetwork[a][b]);
         }
 
         [TestMethod]
@@ -130,6 +130,8 @@ namespace UnitTests
             net.setConnection(a, a1, 4);
 
             Assert.AreEqual(net.socialNetwork[a], net.getAgentsConnections(a));
+            Assert.AreEqual(2, net.getAgentsConnections(a).Count);
+            net.setConnection(a, b, 3);
             Assert.AreEqual(2, net.getAgentsConnections(a).Count);
         }
 
@@ -195,26 +197,19 @@ namespace UnitTests
             Agent a = new Agent();
             Agent b = new Agent();
             Agent c = new Agent();
-            Agent d = new Agent();
-            Agent e = new Agent();
-            Agent f = new Agent();
+            List<Agent> pop = new List<Agent>() { c };
             SocialNetwork net = new SocialNetwork();
             net.setConnection(a, b, 1);
-            net.setConnection(a, c, 0);
-            net.setConnection(b, d, 1);
-            net.setConnection(c, e, 1);
-            net.setConnection(e, f, 1);
-            net.setConnection(d, f, 1);
             //a.setConnections(net.getAgentsConnections(a));
 
             Dialogue dia = new Dialogue();
             dia.C = 0.0;
-            Agent listenerIntrovert = dia.selectListener(a, net);
+            Agent listenerIntrovert = dia.selectListener(a, net, pop);
             dia.C = 1.0;
-            Agent listenerExtrovert = dia.selectListener(a, net);
+            Agent listenerExtrovert = dia.selectListener(a, net, pop);
 
             Assert.AreEqual(b, listenerIntrovert);
-            Assert.AreEqual(f, listenerExtrovert);
+            Assert.AreEqual(c, listenerExtrovert);
         }
 
         [TestMethod]

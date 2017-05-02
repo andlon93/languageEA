@@ -24,9 +24,9 @@ namespace LanguageEvolution
             age = 1;
         }
 
-        public double calculateFitness(List<Tuple<Agent, double>> connections)
+        public double calculateFitness(Dictionary<Agent, double> connections)
         {
-            if(connections.Count == 0) { return 0; }
+            if(connections == null || connections.Count == 0) { return 0; }
 
             double wMax = 0.0;
             double numConnections = connections.Count;
@@ -34,13 +34,13 @@ namespace LanguageEvolution
             double sumOfAllWeights = 0;
             double NStrongWeights = 0;
 
-            foreach (Tuple<Agent, double> i in connections){
-                double weight = i.Item2;
+            foreach (var i in connections){
+                double weight = i.Value;
                 sumOfAllWeights += weight;
                 if (wMax < weight) { wMax = weight; }
                 if(weight > 0.5) { NStrongWeights += 1; }
             }
-
+            Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
             return (sumOfAllWeights/(wMax*numConnections)) * (NStrongWeights / (N-1)) * Math.Exp(-0.05*getAge());
         }
 

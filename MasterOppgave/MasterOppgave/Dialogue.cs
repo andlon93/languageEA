@@ -18,47 +18,39 @@ namespace LanguageEvolution
             return agents[rng.Next(0, agents.Count - 1)];
         }
 
-        public Agent selectListener(Agent agent, SocialNetwork net)
+        public Agent selectListener(Agent agent, SocialNetwork net, List<Agent> population)
         {
-            
-            Random rng = new Random();
-            if (net.getAgentsConnections(agent) == null)
-            {
-                return null;
-            }
-
             var genome = agent.getGenome().getValuesGenome();
             double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
-            List<Tuple<Agent, double>> connections = net.getAgentsConnections(agent);
-            if (rng.NextDouble() <= P_extrovert)
+            Dictionary<Agent, double> connections = net.getAgentsConnections(agent);
+            Random r = new Random();
+            if (r.NextDouble() <= P_extrovert || net.getAgentsConnections(agent) == null)
             {
                 // Extrovert
-                Agent a1;
-                Agent a2;
-                if (connections.Count == 1) { a1 = connections[0].Item1; }
-                else { a1 = connections[rng.Next(0, connections.Count - 1)].Item1; }
-                if (net.getAgentsConnections(a1).Count == 1) { a2 = net.getAgentsConnections(a1)[0].Item1; }
-                else { a2 = net.getAgentsConnections(a1)[rng.Next(0, net.getAgentsConnections(a1).Count - 1)].Item1; }
-                if (net.getAgentsConnections(a2).Count == 1) { return net.getAgentsConnections(a2)[0].Item1; }
-                else { return net.getAgentsConnections(a2)[rng.Next(0, net.getAgentsConnections(a2).Count - 1)].Item1; }
+                Agent listener = population[r.Next(0, population.Count)];
+                while (listener == agent)
+                {
+                    listener = population[r.Next(0, population.Count)];
+                }
+                return listener;
             }
             // Introvert
             double sum = 0;
             foreach(var friend in connections)
             {
-                sum += friend.Item2;
+                sum += friend.Value;
             }
-            double random = rng.NextDouble();
+            double random = r.NextDouble();
             double to = 0;
             foreach(var friend in connections)
             {
-                to += friend.Item2 / sum;
+                to += friend.Value / sum;
                 if(random <= to)
                 {
-                    return friend.Item1;
+                    return friend.Key;
                 }
             }
-            return connections[connections.Count-1].Item1;
+            return null;
         }
 
         public string utterWord(Agent speaker)

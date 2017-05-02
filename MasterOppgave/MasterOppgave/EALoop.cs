@@ -12,7 +12,7 @@ namespace LanguageEvolution
         public static Double mutationProb = 0.05;
         public int k = 5;
         public double eps = 0.2;
-        public static int conversationsPerGeneration = 100;
+        public static int conversationsPerGeneration = 1000;
 
         //public EALoop()
         //{
@@ -24,7 +24,7 @@ namespace LanguageEvolution
         {
             EALoop ea = new EALoop();
 
-            System.Console.WriteLine("STARTING");
+            Console.WriteLine("STARTING");
             SocialNetwork socialNetwork = new SocialNetwork();
             List<Agent> population = new List<Agent>();
             Dialogue dialogue = new Dialogue();
@@ -36,9 +36,21 @@ namespace LanguageEvolution
             Console.WriteLine("size of population: " + population.Count);
 
             ea.performDialogues(socialNetwork, population);
-            Console.WriteLine("Post conversations:");
-            Console.WriteLine("nodes in the socialnetwork: "+ socialNetwork.socialNetwork.Count);
+            Console.WriteLine("nodes in the socialnetwork: "+ socialNetwork);
+
+            ea.fitnessOfPopulation(population, socialNetwork);
+
             Console.Write("");
+        }
+
+        private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork)
+        {
+            foreach (Agent a in population)
+            {
+                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
+                Console.WriteLine("Fitness: "+ fitness);
+                a.setFitness(fitness);
+            }
         }
 
         public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
@@ -47,7 +59,7 @@ namespace LanguageEvolution
             for (int i = 0; i < conversationsPerGeneration; i++)
             {
                 Agent speaker = dialogue.selectSpeaker(population);
-                Agent listener = dialogue.selectListener(speaker, socialNetwork);
+                Agent listener = dialogue.selectListener(speaker, socialNetwork, population);
                 if (listener == null)
                 {
                     Random r = new Random();
