@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LanguageEvolution
 {
@@ -52,6 +51,8 @@ namespace LanguageEvolution
             genomeValues[9] = genomeValues[8] * (1 + (System.Convert.ToDouble(rng.Next(0, n)) / 100)); // Close to value 8
 
             genomeValues[2] = ((genomeValues[1]+genomeValues[3]) / 2) * (1 + (System.Convert.ToDouble(rng.Next(0, n/2)) / 100)); // Close to #3 and #1
+
+            //-- Normalise genome --//
             genomeNormalised = normalise(genomeValues);
         }
 

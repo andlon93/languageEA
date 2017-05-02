@@ -1,27 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LanguageEvolution
 {
     public class EALoop
     {
         public SocialNetwork socialNetwork;
+        public static List<Agent> population;
         public static int populationSize = 12;
         public static Double mutationProb = 0.05;
         public int k = 5;
         public double eps = 0.2;
+        public static int conversationsPerGeneration = 1;
 
         public EALoop()
         {
             socialNetwork = new SocialNetwork();
+            population = new List<Agent>();
         }
 
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Starting");   
+            System.Console.WriteLine("STARTING");
+            SocialNetwork socialNetwork = new SocialNetwork();
+            Dialogue dialogue = new Dialogue();
+
+            for (int i = 0; i < populationSize; i++)
+            {
+                population.Add(new Agent());
+            }
+            Console.WriteLine("size of population: " + population.Count);
+
+            for (int i = 0; i < conversationsPerGeneration; i++)
+            {
+                Agent speaker = dialogue.selectSpeaker(population);
+                Agent Listener = dialogue.selectListener(speaker, socialNetwork);
+                dialogue.utterWord(speaker);
+            }
+
+            Console.Write("");
         }
 
         public List<Agent> survivalSelection(int populationSize, List<Agent> population)
@@ -91,6 +109,10 @@ namespace LanguageEvolution
         public int getPopulationSize()
         {
             return populationSize;
+        }
+        public List<Agent> getPopulation()
+        {
+            return population;
         }
     }
 }

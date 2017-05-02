@@ -294,7 +294,18 @@ namespace UnitTests
                 Assert.AreEqual(10, child2.getGenome().getValuesGenome()[i]);
                 Assert.AreEqual(i, child.getGenome().getValuesGenome()[i]);
             }
-        }    
+        }
+
+        [TestMethod]
+        public void testutterWord()
+        {
+            Agent speaker = new Agent();
+            Dialogue d = new Dialogue();
+            string word = d.utterWord(speaker);
+            speaker.getVocabulary().updateVocabulary(word, 1);
+            Assert.AreEqual(word, d.utterWord(speaker));
+            Assert.AreNotEqual(null, d.utterWord(speaker));
+        }
     }
 }
    

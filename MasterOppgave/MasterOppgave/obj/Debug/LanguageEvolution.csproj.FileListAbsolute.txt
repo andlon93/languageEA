@@ -3,4 +3,3 @@ C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\bin\Debug\MasterOppga
 C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\bin\Debug\MasterOppgave.pdb
 C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\obj\Debug\MasterOppgave.exe
 C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\obj\Debug\MasterOppgave.pdb
-C:\Users\andrl\Kode\languageEA\MasterOppgave\MasterOppgave\obj\Debug\LanguageEvolution.csprojResolveAssemblyReference.cache

@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LanguageEvolution
 {
     public class Agent
-    {
-        // Genome har genotype og phenotype
-        //private double fitness;
-        //private Genome genome;
-        //private List<Tuple<Agent, double>> connections;
-        //private int age;
+    {     
         public double fitness;
+        // Genome har genotype og phenotype
         public Genome genome;
-        //public List<Tuple<Agent, double>> connections;
         public int age;
         public Vocabulary vocabulary;
         public Agent(List<double> genomeValues)
@@ -24,17 +16,10 @@ namespace LanguageEvolution
             vocabulary = new Vocabulary();
             age = 1;
         }
-        //public Agent(List<double> genomeValues, List<Tuple<Agent, double>> connections)
-        //{
-        //    genome = new Genome(genomeValues);
-        //    this.connections = connections;
-        //    age = 1;
-        //}
 
         public Agent()
         {
             genome = new Genome();
-            //connections = new List<Tuple<Agent, double>>();
             vocabulary = new Vocabulary();
             age = 1;
         }
