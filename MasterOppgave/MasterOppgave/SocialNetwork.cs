@@ -57,6 +57,7 @@ namespace LanguageEvolution
                     if (i.Item1.Equals(b))
                     {
                         // Update existing connection
+                        //connection += socialNetwork[a][counter].Item2;
                         socialNetwork[a][counter] = new Tuple<Agent, double>(b, connection);
                     }
                     counter++;

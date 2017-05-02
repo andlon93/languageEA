@@ -32,14 +32,40 @@ namespace LanguageEvolution
             }
             Console.WriteLine("size of population: " + population.Count);
 
+            
+
+            Console.Write("");
+        }
+
+        public void performDialogues(SocialNetwork socialnetwork, List<Agent> population)
+        {
+            Dialogue dialogue = new Dialogue();
             for (int i = 0; i < conversationsPerGeneration; i++)
             {
                 Agent speaker = dialogue.selectSpeaker(population);
                 Agent Listener = dialogue.selectListener(speaker, socialNetwork);
-                dialogue.utterWord(speaker);
+                string utterance = dialogue.utterWord(speaker);
+                bool isSuccess = false;
+                foreach (var word in Listener.getVocabulary().getVocabulary())
+                {
+                    if (word.Item1 == utterance)
+                    {
+                        isSuccess = true;
+                        break;
+                    }
+                }
+                speaker.updatepersonality(Listener, isSuccess);
+                Listener.updatepersonality(speaker, isSuccess);
+                socialNetwork.setConnection(speaker, Listener, getWeight(speaker, isSuccess, socialNetwork.getConnection(speaker, Listener)));
+                socialNetwork.setConnection(Listener, speaker, getWeight(Listener, isSuccess, socialNetwork.getConnection(Listener, speaker)));
             }
+        }
 
-            Console.Write("");
+        public double getWeight(Agent a, bool isSuccess, double connection)
+        {
+            if (isSuccess)
+                return connection + a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
+            return connection + a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 1;
         }
 
         public List<Agent> survivalSelection(int populationSize, List<Agent> population)

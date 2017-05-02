@@ -306,6 +306,15 @@ namespace UnitTests
             Assert.AreEqual(word, d.utterWord(speaker));
             Assert.AreNotEqual(null, d.utterWord(speaker));
         }
+
+        [TestMethod]
+        public void testGetWeight()
+        {
+            Agent a = new Agent(new List<double>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+            EALoop e = new EALoop();
+            Assert.AreEqual(1, e.getWeight(a, true, 0));
+            Assert.AreEqual(-1, e.getWeight(a, false, 0));
+        }
     }
 }
    
