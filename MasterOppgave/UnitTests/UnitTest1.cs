@@ -56,6 +56,13 @@ namespace UnitTests
                 sum2 += i;
             }
             Assert.AreNotEqual(sum, sum2);
+            g.mutate(0.0);
+            double sum3 = 0;
+            foreach (double i in g.getValuesGenome())
+            {
+                sum3 += i;
+            }
+            Assert.AreEqual(sum2, sum3);
         }
 
         [TestMethod]

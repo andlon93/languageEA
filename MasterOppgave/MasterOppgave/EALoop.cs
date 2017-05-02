@@ -48,7 +48,7 @@ namespace LanguageEvolution
             foreach (Agent a in population)
             {
                 double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
-                Console.WriteLine("Fitness: "+ fitness);
+                Console.WriteLine("Fitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
         }

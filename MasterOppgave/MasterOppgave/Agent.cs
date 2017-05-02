@@ -41,6 +41,7 @@ namespace LanguageEvolution
                 if(weight > 0.5) { NStrongWeights += 1; }
             }
             Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
+            if (wMax == 0 || numConnections == 0) { return 0; }
             return (sumOfAllWeights/(wMax*numConnections)) * (NStrongWeights / (N-1)) * Math.Exp(-0.05*getAge());
         }
 

@@ -78,9 +78,9 @@ namespace LanguageEvolution
             if(rng.NextDouble() <= p)
             {
                 double mutateRate = (rng.Next(4) - 2) / 10; // Blir et tall mellom -0.2 og 0.2
-                while(mutateRate == 0.0) { mutateRate = (rng.Next(4) - 2) / 10; }
+                if (mutateRate == 0.0) { mutateRate = 1.01; }
                 int index = rng.Next(genomeValues.Count);
-                genomeValues[index] *= mutateRate;
+                genomeValues[index] = genomeValues[index]*mutateRate;
                 genomeNormalised = normalise(genomeValues);
             }
         }
