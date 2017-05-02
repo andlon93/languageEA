@@ -308,7 +308,7 @@ namespace UnitTests
             Agent a = new Agent(new List<double>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
             EALoop e = new EALoop();
             Assert.AreEqual(1, e.getWeight(a, true, 0));
-            Assert.AreEqual(-1, e.getWeight(a, false, 0));
+            Assert.AreEqual(0, e.getWeight(a, false, 0));
         }
     }
 }
