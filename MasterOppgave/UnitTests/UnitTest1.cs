@@ -62,17 +62,17 @@ namespace UnitTests
         public void fitnessCalculationTest()
         {
             EALoop ea = new EALoop();
-
+            SocialNetwork socialNetwork = new SocialNetwork();
             Agent agent = new Agent();
-            ea.socialNetwork.setConnection(agent, new Agent(), 10);
-            ea.socialNetwork.setConnection(agent, new Agent(), 1);
-            ea.socialNetwork.setConnection(agent, new Agent(), 1);
-            ea.socialNetwork.setConnection(agent, new Agent(), 1);
-            ea.socialNetwork.setConnection(agent, new Agent(), 1);
-            ea.socialNetwork.setConnection(agent, new Agent(), 1);
+            socialNetwork.setConnection(agent, new Agent(), 10);
+            socialNetwork.setConnection(agent, new Agent(), 1);
+            socialNetwork.setConnection(agent, new Agent(), 1);
+            socialNetwork.setConnection(agent, new Agent(), 1);
+            socialNetwork.setConnection(agent, new Agent(), 1);
+            socialNetwork.setConnection(agent, new Agent(), 1);
             while (agent.getAge() < 2) { agent.incrementAge(); }
 
-            Assert.AreEqual(0.1233869206412672, agent.calculateFitness(ea.socialNetwork.getAgentsConnections(agent)));
+            Assert.AreEqual(0.1233869206412672, agent.calculateFitness(socialNetwork.getAgentsConnections(agent)));
 
         }
 

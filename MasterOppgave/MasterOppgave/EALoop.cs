@@ -6,24 +6,27 @@ namespace LanguageEvolution
 {
     public class EALoop
     {
-        public SocialNetwork socialNetwork;
-        public static List<Agent> population;
+        //public SocialNetwork socialNetwork;
+        //public List<Agent> population;
         public static int populationSize = 12;
         public static Double mutationProb = 0.05;
         public int k = 5;
         public double eps = 0.2;
-        public static int conversationsPerGeneration = 1;
+        public static int conversationsPerGeneration = 100;
 
-        public EALoop()
-        {
-            socialNetwork = new SocialNetwork();
-            population = new List<Agent>();
-        }
+        //public EALoop()
+        //{
+        //    socialNetwork = new SocialNetwork();
+        //    population = new List<Agent>();
+        //}
 
         static void Main(string[] args)
         {
+            EALoop ea = new EALoop();
+
             System.Console.WriteLine("STARTING");
             SocialNetwork socialNetwork = new SocialNetwork();
+            List<Agent> population = new List<Agent>();
             Dialogue dialogue = new Dialogue();
 
             for (int i = 0; i < populationSize; i++)
@@ -32,21 +35,30 @@ namespace LanguageEvolution
             }
             Console.WriteLine("size of population: " + population.Count);
 
-            
-
+            ea.performDialogues(socialNetwork, population);
+            Console.WriteLine("Post conversations:");
+            Console.WriteLine("nodes in the socialnetwork: "+ socialNetwork.socialNetwork.Count);
             Console.Write("");
         }
 
-        public void performDialogues(SocialNetwork socialnetwork, List<Agent> population)
+        public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
         {
             Dialogue dialogue = new Dialogue();
             for (int i = 0; i < conversationsPerGeneration; i++)
             {
                 Agent speaker = dialogue.selectSpeaker(population);
-                Agent Listener = dialogue.selectListener(speaker, socialNetwork);
+                Agent listener = dialogue.selectListener(speaker, socialNetwork);
+                if (listener == null)
+                {
+                    Random r = new Random();
+                    while (listener == null || listener == speaker)
+                    {
+                        listener = population[r.Next(0, population.Count)];
+                    }
+                }
                 string utterance = dialogue.utterWord(speaker);
                 bool isSuccess = false;
-                foreach (var word in Listener.getVocabulary().getVocabulary())
+                foreach (var word in listener.getVocabulary().getVocabulary())
                 {
                     if (word.Item1 == utterance)
                     {
@@ -54,10 +66,11 @@ namespace LanguageEvolution
                         break;
                     }
                 }
-                speaker.updatepersonality(Listener, isSuccess);
-                Listener.updatepersonality(speaker, isSuccess);
-                socialNetwork.setConnection(speaker, Listener, getWeight(speaker, isSuccess, socialNetwork.getConnection(speaker, Listener)));
-                socialNetwork.setConnection(Listener, speaker, getWeight(Listener, isSuccess, socialNetwork.getConnection(Listener, speaker)));
+                speaker.updatepersonality(listener, isSuccess);
+                listener.updatepersonality(speaker, isSuccess);
+                socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess, socialNetwork.getConnection(speaker, listener)));
+                socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess, socialNetwork.getConnection(listener, speaker)));
+                System.Threading.Thread.Sleep(1);
             }
         }
 
@@ -135,10 +148,6 @@ namespace LanguageEvolution
         public int getPopulationSize()
         {
             return populationSize;
-        }
-        public List<Agent> getPopulation()
-        {
-            return population;
         }
     }
 }

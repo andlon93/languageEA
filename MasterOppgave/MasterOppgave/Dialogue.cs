@@ -20,12 +20,17 @@ namespace LanguageEvolution
 
         public Agent selectListener(Agent agent, SocialNetwork net)
         {
+            
+            Random rng = new Random();
+            if (net.getAgentsConnections(agent) == null)
+            {
+                return null;
+            }
+
             var genome = agent.getGenome().getValuesGenome();
             double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
-
-            Random rng = new Random();
             List<Tuple<Agent, double>> connections = net.getAgentsConnections(agent);
-            if(rng.NextDouble() <= P_extrovert)
+            if (rng.NextDouble() <= P_extrovert)
             {
                 // Extrovert
                 Agent a1;
