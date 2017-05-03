@@ -120,7 +120,7 @@ namespace UnitTests
             net.setConnection(a, a1, 4); // ny connection for eksisterende agent.
             Assert.AreEqual(2, net.socialNetwork[a].Count);
 
-            net.setConnection(a, b, 10);
+            net.setConnection(a, b, 8);
             Assert.AreEqual(10, net.socialNetwork[a][b]);
         }
 
@@ -166,17 +166,19 @@ namespace UnitTests
 
             a.getVocabulary().updateVocabulary("s", 1);
             Assert.AreEqual(1, a.getVocabulary().getVocabulary().Count);
-            Assert.AreEqual("s", a.getVocabulary().getVocabulary()[0].Item1);
+            Assert.AreEqual(true, a.getVocabulary().getVocabulary().ContainsKey("s"));
 
             a.getVocabulary().updateVocabulary("t", 2);
             a.getVocabulary().updateVocabulary("u", 0);
             Assert.AreEqual(3, a.getVocabulary().getVocabulary().Count);
-            Assert.AreEqual("u", a.getVocabulary().getVocabulary()[0].Item1);
+            Assert.AreEqual(true, a.getVocabulary().getVocabulary().ContainsKey("u"));
+            Assert.AreEqual(0, a.getVocabulary().getVocabulary()["u"]);
 
             a.getVocabulary().updateVocabulary("u", 3);            
-            Assert.AreEqual("u", a.getVocabulary().getVocabulary()[2].Item1);
-            Assert.AreEqual(3, a.getVocabulary().getVocabulary()[2].Item2);
-            Assert.AreEqual("s", a.getVocabulary().getVocabulary()[0].Item1);
+            Assert.AreEqual(true, a.getVocabulary().getVocabulary().ContainsKey("u"));
+            Assert.AreEqual(3, a.getVocabulary().getVocabulary()["u"]);
+            Assert.AreEqual(true, a.getVocabulary().getVocabulary().ContainsKey("s"));
+            Assert.AreEqual(3, a.getVocabulary().getVocabulary().Count);
         }
 
         [TestMethod]
@@ -314,8 +316,8 @@ namespace UnitTests
         {
             Agent a = new Agent(new List<double>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
             EALoop e = new EALoop();
-            Assert.AreEqual(1, e.getWeight(a, true, 0));
-            Assert.AreEqual(0, e.getWeight(a, false, 0));
+            Assert.AreEqual(1, e.getWeight(a, true));
+            Assert.AreEqual(-0.5, e.getWeight(a, false));
         }
     }
 }

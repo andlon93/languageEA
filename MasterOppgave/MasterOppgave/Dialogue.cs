@@ -55,7 +55,7 @@ namespace LanguageEvolution
 
         public string utterWord(Agent speaker)
         {
-            List<Tuple<string, double>> vocabulary = speaker.getVocabulary().getVocabulary();
+            Dictionary<string, double> vocabulary = speaker.getVocabulary().getVocabulary();
             
             if (vocabulary.Count == 0)
             {
@@ -63,19 +63,22 @@ namespace LanguageEvolution
             }
 
             double sum = 0;
-            for (int i = 0; i < vocabulary.Count; i++)
+            foreach(var i in vocabulary.Values)
             {
-                sum += vocabulary[i].Item2;
+                sum += i;
             }
             Random rng = new Random();
             double rnd = rng.NextDouble();
             double prob = 0;
-            for (int i = 0; i < vocabulary.Count; i++)
+            foreach(var i in vocabulary)
             {
-                prob += vocabulary[i].Item2 / sum;
-                if (rnd <= prob)
-                    return vocabulary[i].Item1;
+                prob += i.Value / sum;
+                if(rnd <= prob)
+                {
+                    return i.Key;
+                }
             }
+            Console.WriteLine("-null- is returned. SOMETHING IS WRONG");
             return null;
         }
         private string newWord()
