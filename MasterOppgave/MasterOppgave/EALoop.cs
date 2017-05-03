@@ -6,11 +6,11 @@ namespace LanguageEvolution
 {
     public class EALoop
     {
-        public static int populationSize = 12;
+        public static int populationSize = 250;
         public static Double mutationProb = 0.05;
         public int k = 5;
         public double eps = 0.2;
-        public static int conversationsPerGeneration = 120;
+        public static int conversationsPerGeneration = 2500;
 
         static void Main(string[] args)
         {
@@ -26,23 +26,30 @@ namespace LanguageEvolution
                 population.Add(new Agent());
             }
             Console.WriteLine("size of population: " + population.Count);
-
-            ea.performDialogues(socialNetwork, population);
-            Console.WriteLine("nodes in the socialnetwork: "+ socialNetwork.socialNetwork.Count);
-
-            ea.breed(population, socialNetwork);
-
-            ea.fitnessOfPopulation(population, socialNetwork);
-            population = population.OrderBy(agent => agent.getFitness()).ToList();
-            population.Reverse();
-            Console.WriteLine("Size of population: " + population.Count);
-            foreach(Agent a in population)
+            int generations = 0;
+            while (generations < 2)
             {
-                Console.WriteLine("Fitness: " + a.getFitness());
-            }
+                ea.performDialogues(socialNetwork, population);
+                Console.WriteLine("nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
-            population = ea.survivalSelection(populationSize, population);
-            Console.WriteLine("\nSize of population: " + population.Count);
+                ea.breed(population, socialNetwork);
+
+                ea.fitnessOfPopulation(population, socialNetwork);
+                population = population.OrderBy(agent => agent.getFitness()).ToList();
+                population.Reverse();
+                Console.WriteLine("Size of population: " + population.Count);
+                foreach (Agent a in population)
+                {
+                    Console.WriteLine("Fitness: " + a.getFitness());
+                }
+
+                population = ea.survivalSelection(populationSize, population, socialNetwork);
+                Console.WriteLine("\nSize of population: " + population.Count);
+
+
+
+                generations++;
+            }
             Console.Write("");
         }
 
@@ -133,11 +140,33 @@ namespace LanguageEvolution
         //    return weight;
         }
 
-        public List<Agent> survivalSelection(int populationSize, List<Agent> population)
+        public List<Agent> survivalSelection(int populationSize, List<Agent> population, SocialNetwork socialNetwork)
         {
+            List<Agent> deadAgents = new List<Agent>();
             List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
-            sortedList.RemoveRange(0, populationSize);
-            return sortedList;
+            Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
+            sortedList.Reverse();
+
+            deadAgents = sortedList.GetRange(populationSize, populationSize);
+            foreach(var a in socialNetwork.socialNetwork.ToList())
+            {
+                if (deadAgents.Contains(a.Key))
+                {
+                    socialNetwork.socialNetwork.Remove(a.Key);
+                }
+                else
+                {
+                    foreach(var b in socialNetwork.socialNetwork[a.Key].ToList())
+                    {
+                        if (deadAgents.Contains(b.Key))
+                        {
+                            socialNetwork.socialNetwork[a.Key].Remove(b.Key);
+                        }
+                    }
+                }
+            }
+
+            return sortedList.GetRange(0, populationSize);
         }
 
         public Agent tournamentSelection(List<Agent> allAgents)

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LanguageEvolution
 {
     public class Dialogue
     {
-        public double C = 0.5;
+        public double C = 0.25;
 
         public Dialogue()
         {
@@ -63,14 +64,17 @@ namespace LanguageEvolution
             }
 
             double sum = 0;
-            foreach(var i in vocabulary.Values)
+            var sortedDict = from entry in vocabulary orderby entry.Value descending select entry;
+            //sortedDict.Reverse();
+            foreach (var i in sortedDict)
             {
-                sum += i;
+                sum += i.Value;
             }
             Random rng = new Random();
             double rnd = rng.NextDouble();
             double prob = 0;
-            foreach(var i in vocabulary)
+            
+            foreach (var i in sortedDict)
             {
                 prob += i.Value / sum;
                 if(rnd <= prob)
@@ -78,8 +82,9 @@ namespace LanguageEvolution
                     return i.Key;
                 }
             }
-            Console.WriteLine("-null- is returned. SOMETHING IS WRONG");
-            return null;
+            return sortedDict.ElementAt(0).Key;
+            //Console.WriteLine("-null- is returned. SOMETHING IS WRONG");
+            //return null;
         }
         private string newWord()
         {

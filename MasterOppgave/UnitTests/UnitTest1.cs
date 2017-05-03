@@ -93,7 +93,7 @@ namespace UnitTests
             Agent a4 = new Agent(); a4.setFitness(12);
             List<Agent> pop = new List<Agent>() { a1, a2, a3, a4 };
             List<Agent> survived = new List<Agent>();
-            survived = ea.survivalSelection(2, pop);
+            survived = ea.survivalSelection(2, pop, new SocialNetwork());
 
             //System.Diagnostics.Debug.WriteLine(survived[0].getFitness());
             //System.Diagnostics.Debug.WriteLine(survived[1].getFitness());
