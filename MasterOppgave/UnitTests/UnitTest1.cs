@@ -69,6 +69,7 @@ namespace UnitTests
         public void fitnessCalculationTest()
         {
             EALoop ea = new EALoop();
+            EALoop.populationSize = 12;
             SocialNetwork socialNetwork = new SocialNetwork();
             Agent agent = new Agent();
             socialNetwork.setConnection(agent, new Agent(), 10);
@@ -98,8 +99,8 @@ namespace UnitTests
             //System.Diagnostics.Debug.WriteLine(survived[0].getFitness());
             //System.Diagnostics.Debug.WriteLine(survived[1].getFitness());
             Assert.AreEqual(2, survived.Count);
-            Assert.AreEqual(11, survived[0].getFitness());
-            Assert.AreEqual(12, survived[1].getFitness());
+            Assert.AreEqual(12, survived[0].getFitness());
+            Assert.AreEqual(11, survived[1].getFitness());
         }
 
         [TestMethod]

@@ -26,27 +26,29 @@ namespace LanguageEvolution
                 population.Add(new Agent());
             }
             Console.WriteLine("size of population: " + population.Count);
-            int generations = 0;
-            while (generations < 2)
+            ea.performDialogues(socialNetwork, population);
+            ea.fitnessOfPopulation(population, socialNetwork);
+
+            int generations = 1;
+            while (generations < 10)
             {
-                ea.performDialogues(socialNetwork, population);
+                Console.WriteLine("\nGeneration number: " + generations);
                 Console.WriteLine("nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
                 ea.breed(population, socialNetwork);
 
+                ea.performDialogues(socialNetwork, population);
+
                 ea.fitnessOfPopulation(population, socialNetwork);
-                population = population.OrderBy(agent => agent.getFitness()).ToList();
-                population.Reverse();
+                
                 Console.WriteLine("Size of population: " + population.Count);
-                foreach (Agent a in population)
-                {
-                    Console.WriteLine("Fitness: " + a.getFitness());
-                }
+                //foreach (Agent a in population)
+                //{
+                //    Console.WriteLine("Fitness: " + a.getFitness());
+                //}
 
                 population = ea.survivalSelection(populationSize, population, socialNetwork);
-                Console.WriteLine("\nSize of population: " + population.Count);
-
-
+                Console.WriteLine("Size of population after survival selection: " + population.Count);
 
                 generations++;
             }
@@ -76,10 +78,11 @@ namespace LanguageEvolution
             foreach (Agent a in population)
             {
                 double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
-                Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
+                //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
-            
+            population = population.OrderBy(agent => agent.getFitness()).ToList();
+            population.Reverse();
         }
 
         public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
@@ -144,11 +147,19 @@ namespace LanguageEvolution
         {
             List<Agent> deadAgents = new List<Agent>();
             List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
-            Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
+            //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
             sortedList.Reverse();
 
             deadAgents = sortedList.GetRange(populationSize, populationSize);
-            foreach(var a in socialNetwork.socialNetwork.ToList())
+            removeDeadAgents(socialNetwork, deadAgents, populationSize);
+
+            return sortedList.GetRange(0, populationSize);
+        }
+
+        private void removeDeadAgents(SocialNetwork socialNetwork, List<Agent> deadAgents, int populationSize)
+        {
+            
+            foreach (var a in socialNetwork.socialNetwork.ToList())
             {
                 if (deadAgents.Contains(a.Key))
                 {
@@ -156,7 +167,7 @@ namespace LanguageEvolution
                 }
                 else
                 {
-                    foreach(var b in socialNetwork.socialNetwork[a.Key].ToList())
+                    foreach (var b in socialNetwork.socialNetwork[a.Key].ToList())
                     {
                         if (deadAgents.Contains(b.Key))
                         {
@@ -165,8 +176,6 @@ namespace LanguageEvolution
                     }
                 }
             }
-
-            return sortedList.GetRange(0, populationSize);
         }
 
         public Agent tournamentSelection(List<Agent> allAgents)
@@ -202,8 +211,7 @@ namespace LanguageEvolution
                     return pool[i];
             }
 
-            Console.WriteLine("SOMETHING WENT WRONG");
-            return null;
+            return pool[0];
         }
 
         public Agent crossover(Agent a, Agent b)
