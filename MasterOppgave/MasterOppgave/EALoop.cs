@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace LanguageEvolution
 {
     public class EALoop
     {
-        public static int populationSize = 250;
-        public static Double mutationProb = 0.05;
+        Mutex breedMut = new Mutex();
+        Mutex diaMut = new Mutex();
+        public static int populationSize = 1000;
+        public static int numThreads = populationSize;
+        public static Double mutationProb = 0.01;
         public int k = 5;
         public double eps = 0.2;
-        public static int conversationsPerGeneration = 2500;
+        public static int d = 1;
+        public static int Totalgenerations = 100;
 
         static void Main(string[] args)
         {
@@ -26,51 +31,72 @@ namespace LanguageEvolution
                 population.Add(new Agent());
             }
             Console.WriteLine("size of population: " + population.Count);
-            ea.performDialogues(socialNetwork, population);
+            ea.dialogueThreads(socialNetwork, population);
             ea.fitnessOfPopulation(population, socialNetwork);
 
             int generations = 1;
-            while (generations < 10)
+            while (generations < Totalgenerations)
             {
                 Console.WriteLine("\nGeneration number: " + generations);
-                Console.WriteLine("nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
+                Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
-                ea.breed(population, socialNetwork);
+                //--   MAKE CHILDREN   --//
+                population.AddRange(ea.makeChildren(population, socialNetwork));
+                Console.WriteLine("Size of population after children was made: " + population.Count);
 
-                ea.performDialogues(socialNetwork, population);
+                //--    PERFORM DIALOGUES   --//
+                ea.dialogueThreads(socialNetwork, population);
+                Console.WriteLine("Dialogues performed");
 
+                //--    CALCULATE FITNESS   --//
                 ea.fitnessOfPopulation(population, socialNetwork);
+                Console.WriteLine("Fitness calculated");
                 
-                Console.WriteLine("Size of population: " + population.Count);
-                //foreach (Agent a in population)
-                //{
-                //    Console.WriteLine("Fitness: " + a.getFitness());
-                //}
-
+                //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(populationSize, population, socialNetwork);
                 Console.WriteLine("Size of population after survival selection: " + population.Count);
 
                 generations++;
             }
-            Console.Write("");
+            Console.Write("Press any button to end");
         }
 
-        public void breed(List<Agent> pop, SocialNetwork socialNetwork)
+        public List<Agent> makeChildren(List<Agent> population, SocialNetwork socialNetwork)
+        {
+            EALoop ea = new EALoop();
+            List<Agent> Children = new List<Agent>();
+            List<Thread> ts = new List<Thread>();
+            for(int i = 0; i < numThreads; i++)
+            {
+                Thread t = new Thread(new ThreadStart(() => Children.AddRange(ea.breed(population, socialNetwork))));
+                t.Name = String.Format("t{0}", i + 1);
+                t.Start();
+                ts.Add(t);
+            }
+            foreach(var t in ts)
+            {
+                t.Join();
+            }
+            return Children;
+        }
+
+        public List<Agent> breed(List<Agent> pop, SocialNetwork socialNetwork)
         {
             List<Agent> children = new List<Agent>();
-            for(int i = 0; i < pop.Count; i++)
+            for (int i = 0; i < pop.Count/numThreads; i++)
             {
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
                 Agent child = crossover(parent1, parent2);
+                breedMut.WaitOne(); // MUTEX start
+                performDialogue(parent1, child, socialNetwork);
+                performDialogue(parent2, child, socialNetwork);
+                performDialogue(parent1, child, socialNetwork);
+                performDialogue(parent2, child, socialNetwork);
+                breedMut.ReleaseMutex(); // MUTEX end
                 children.Add(child);
-                performDialogue(parent1, child, socialNetwork);
-                performDialogue(parent2, child, socialNetwork);
-                performDialogue(parent1, child, socialNetwork);
-                performDialogue(parent2, child, socialNetwork);
             }
-            pop.AddRange(children);
-            
+            return children;
         }
 
         private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork)
@@ -85,10 +111,26 @@ namespace LanguageEvolution
             population.Reverse();
         }
 
+        public void dialogueThreads(SocialNetwork socialNetwork, List<Agent> population)
+        {
+            List<Thread> ts = new List<Thread>();
+            for (int i = 0; i < numThreads; i++)
+            {
+                Thread t = new Thread(new ThreadStart(() => performDialogues(socialNetwork, population)));
+                t.Name = String.Format("t{0}", i + 1);
+                t.Start();
+                ts.Add(t);
+            }
+            foreach (var t in ts)
+            {
+                t.Join();
+            }
+        }
+
         public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
         {
             Dialogue dialogue = new Dialogue();
-            for (int i = 0; i < conversationsPerGeneration; i++)
+            for(int i = 0; i<((population.Count*d)/numThreads); i++)
             {
                 Agent speaker = dialogue.selectSpeaker(population);
                 Agent listener = dialogue.selectListener(speaker, socialNetwork, population);
@@ -101,7 +143,7 @@ namespace LanguageEvolution
                     }
                 }
                 performDialogue(speaker, listener, socialNetwork);
-                
+                Thread.Sleep(1);
             }
         }
 
@@ -110,6 +152,8 @@ namespace LanguageEvolution
             Dialogue dialogue = new Dialogue();
             string utterance = dialogue.utterWord(speaker);
             bool isSuccess = false;
+
+            diaMut.WaitOne(); 
             if (!(listener.getVocabulary().getVocabulary() == null) && listener.getVocabulary().getVocabulary().ContainsKey(utterance))
             {
                 isSuccess = true;
@@ -127,7 +171,7 @@ namespace LanguageEvolution
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
-            System.Threading.Thread.Sleep(1);
+            diaMut.ReleaseMutex();
         }
 
         public double getWeight(Agent a, bool isSuccess)

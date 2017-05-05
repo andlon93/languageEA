@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace LanguageEvolution
 {
     public class Vocabulary
     {
-        //List<Tuple<string, double>> vocabulary;
+        Mutex mut = new Mutex();
         Dictionary<string, double> vocabulary;
         public Vocabulary(Dictionary<string, double> vocabulary)
         {
