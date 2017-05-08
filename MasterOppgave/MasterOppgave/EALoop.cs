@@ -15,7 +15,8 @@ namespace LanguageEvolution
         public int k = 5;
         public double eps = 0.2;
         public static int d = 1;
-        public static int Totalgenerations = 100;
+        public static int Totalgenerations = 5;
+        
 
         static void Main(string[] args)
         {
@@ -23,6 +24,7 @@ namespace LanguageEvolution
 
             Console.WriteLine("STARTING");
             SocialNetwork socialNetwork = new SocialNetwork();
+            DataCollector data = new DataCollector();
             List<Agent> population = new List<Agent>();
             Dialogue dialogue = new Dialogue();
 
@@ -30,34 +32,38 @@ namespace LanguageEvolution
             {
                 population.Add(new Agent());
             }
-            Console.WriteLine("size of population: " + population.Count);
+            //Console.WriteLine("size of population: " + population.Count);
             ea.dialogueThreads(socialNetwork, population);
             ea.fitnessOfPopulation(population, socialNetwork);
+            data.addFitnessData(population);
 
             int generations = 1;
             while (generations < Totalgenerations)
             {
                 Console.WriteLine("\nGeneration number: " + generations);
-                Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
+                //Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
                 //--   MAKE CHILDREN   --//
                 population.AddRange(ea.makeChildren(population, socialNetwork));
-                Console.WriteLine("Size of population after children was made: " + population.Count);
+                //Console.WriteLine("Size of population after children was made: " + population.Count);
 
                 //--    PERFORM DIALOGUES   --//
                 ea.dialogueThreads(socialNetwork, population);
-                Console.WriteLine("Dialogues performed");
+                //Console.WriteLine("Dialogues performed");
 
                 //--    CALCULATE FITNESS   --//
                 ea.fitnessOfPopulation(population, socialNetwork);
-                Console.WriteLine("Fitness calculated");
+                //Console.WriteLine("Fitness calculated");
                 
                 //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(populationSize, population, socialNetwork);
-                Console.WriteLine("Size of population after survival selection: " + population.Count);
+                data.addFitnessData(population);
+                //Console.WriteLine("Size of population after survival selection: " + population.Count);
 
                 generations++;
             }
+            Console.WriteLine("fitness data: " + data.getFitnessdata().Count);
+            data.writeFitnessToFile();
             Console.Write("Press any button to end");
         }
 
@@ -104,7 +110,7 @@ namespace LanguageEvolution
             foreach (Agent a in population)
             {
                 double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
-                //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
+                // Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
             population = population.OrderBy(agent => agent.getFitness()).ToList();
