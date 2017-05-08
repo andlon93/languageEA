@@ -274,7 +274,6 @@ namespace UnitTests
                     e_count++;
                 else if (fitness == 100)
                     error++;
-                System.Threading.Thread.Sleep(1);
             }
             System.Diagnostics.Debug.WriteLine("\n\n"+N+ " tournaments run with p as "+ (1-eps));
             System.Diagnostics.Debug.WriteLine("A: "+ (a_count/N)*100);
@@ -318,7 +317,7 @@ namespace UnitTests
             Agent a = new Agent(new List<double>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
             EALoop e = new EALoop();
             Assert.AreEqual(1, e.getWeight(a, true));
-            Assert.AreEqual(-0.5, e.getWeight(a, false));
+            Assert.AreEqual(0, e.getWeight(a, false));
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace LanguageEvolution
 {
@@ -25,7 +21,6 @@ namespace LanguageEvolution
             }
             averageFitness.Add(sum / p.Count);
         }
-
         public List<double> getFitnessdata()
         {
             return averageFitness;

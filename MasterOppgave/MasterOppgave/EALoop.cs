@@ -9,14 +9,15 @@ namespace LanguageEvolution
     {
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
-        public static int populationSize = 1000;
+        public static int populationSize = 1225;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
         public int k = 5;
         public double eps = 0.2;
-        public static int d = 1;
-        public static int Totalgenerations = 5;
-        
+        public static int d = 5;
+        public static int Totalgenerations = 100;
+        public static readonly Random random = new Random();
+        public static readonly object syncLock = new object();
 
         static void Main(string[] args)
         {
@@ -36,7 +37,7 @@ namespace LanguageEvolution
             ea.dialogueThreads(socialNetwork, population);
             ea.fitnessOfPopulation(population, socialNetwork);
             data.addFitnessData(population);
-
+            ea.updateAges(population);
             int generations = 1;
             while (generations < Totalgenerations)
             {
@@ -57,6 +58,7 @@ namespace LanguageEvolution
                 
                 //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(populationSize, population, socialNetwork);
+                ea.updateAges(population);
                 data.addFitnessData(population);
                 //Console.WriteLine("Size of population after survival selection: " + population.Count);
 
@@ -67,11 +69,20 @@ namespace LanguageEvolution
             Console.Write("Press any button to end");
         }
 
+        public void updateAges(List<Agent> p)
+        {
+            foreach(var a in p)
+            {
+                a.incrementAge();
+            }
+        }
+
         public List<Agent> makeChildren(List<Agent> population, SocialNetwork socialNetwork)
         {
             EALoop ea = new EALoop();
             List<Agent> Children = new List<Agent>();
             List<Thread> ts = new List<Thread>();
+            
             for(int i = 0; i < numThreads; i++)
             {
                 Thread t = new Thread(new ThreadStart(() => Children.AddRange(ea.breed(population, socialNetwork))));
@@ -120,7 +131,7 @@ namespace LanguageEvolution
         public void dialogueThreads(SocialNetwork socialNetwork, List<Agent> population)
         {
             List<Thread> ts = new List<Thread>();
-            for (int i = 0; i < numThreads; i++)
+            for (int i = 0; i < numThreads*d; i++)
             {
                 Thread t = new Thread(new ThreadStart(() => performDialogues(socialNetwork, population)));
                 t.Name = String.Format("t{0}", i + 1);
@@ -136,21 +147,17 @@ namespace LanguageEvolution
         public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
         {
             Dialogue dialogue = new Dialogue();
-            for(int i = 0; i<((population.Count*d)/numThreads); i++)
+            Agent speaker = dialogue.selectSpeaker(population);
+            Agent listener = dialogue.selectListener(speaker, socialNetwork, population);
+            if (listener == null)
             {
-                Agent speaker = dialogue.selectSpeaker(population);
-                Agent listener = dialogue.selectListener(speaker, socialNetwork, population);
-                if (listener == null)
+                while (listener == null || listener == speaker)
                 {
-                    Random r = new Random();
-                    while (listener == null || listener == speaker)
-                    {
-                        listener = population[r.Next(0, population.Count)];
-                    }
+                    listener = population[RandomInt(0, population.Count)];
                 }
-                performDialogue(speaker, listener, socialNetwork);
-                Thread.Sleep(1);
             }
+            performDialogue(speaker, listener, socialNetwork);
+
         }
 
         private void performDialogue(Agent speaker, Agent listener, SocialNetwork socialNetwork)
@@ -168,12 +175,12 @@ namespace LanguageEvolution
             }
             else
             {
-                speaker.getVocabulary().updateVocabulary(utterance, -0.2);
-                listener.getVocabulary().updateVocabulary(utterance, -0.2);
+                speaker.getVocabulary().updateVocabulary(utterance, 0);
+                listener.getVocabulary().updateVocabulary(utterance, 0);
             }
 
-            speaker.updatepersonality(listener, isSuccess);
-            listener.updatepersonality(speaker, isSuccess);
+            //speaker.updatepersonality(listener, isSuccess);
+            //listener.updatepersonality(speaker, isSuccess);
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
@@ -184,13 +191,13 @@ namespace LanguageEvolution
         {
             if (isSuccess)
             {
-                return 1;
-                //return connection + a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
+                //return 1;
+                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
             }
-            return -0.5;
-        //    double weight = connection + a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 1;
-        //    if (weight < 0) { return 0; }
-        //    return weight;
+            //return -0.5;
+            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 0.5;
+            if (weight < 0) { return 0; }
+            return weight;
         }
 
         public List<Agent> survivalSelection(int populationSize, List<Agent> population, SocialNetwork socialNetwork)
@@ -199,7 +206,7 @@ namespace LanguageEvolution
             List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
             //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
             sortedList.Reverse();
-
+            Console.WriteLine("fitnesses: " + sortedList[0].getFitness() + "  " + sortedList[sortedList.Count - 1].getFitness());
             deadAgents = sortedList.GetRange(populationSize, populationSize);
             removeDeadAgents(socialNetwork, deadAgents, populationSize);
 
@@ -231,11 +238,10 @@ namespace LanguageEvolution
         public Agent tournamentSelection(List<Agent> allAgents)
         {
             List<Agent> pool = new List<Agent>(k);
-            Random rng = new Random();
             int numberOfAgents = allAgents.Count;
             while (pool.Count < k)
             {
-                int i = rng.Next(0, numberOfAgents);
+                int i = RandomInt(0, numberOfAgents);
                 if (!pool.Contains(allAgents[i]))
                 {
                     pool.Add(allAgents[i]);
@@ -252,7 +258,7 @@ namespace LanguageEvolution
                 pList.Add(prob);
                 sum += prob;
             }
-            double rnd = rng.NextDouble();
+            double rnd = RandomDouble();
             double p = 0;
             for (int i = 0; i < pool.Count; i++)
             {
@@ -282,7 +288,21 @@ namespace LanguageEvolution
 
             return new Agent(childGenome);
         }
-        
+
+        public static int RandomInt(int min, int max)
+        {
+            lock (syncLock)
+            { // synchronize
+                return random.Next(min, max);
+            }
+        }
+        public static double RandomDouble()
+        {
+            lock (syncLock)
+            { // synchronize
+                return random.NextDouble();
+            }
+        }
         //-- getters and setters --//
         public int getPopulationSize()
         {

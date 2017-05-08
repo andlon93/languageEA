@@ -42,13 +42,13 @@ namespace LanguageEvolution
                 }
                 else
                 {
-                    socialNetwork[a].Add(b, Math.Max(0, connection));
+                    socialNetwork[a].Add(b, connection);
                 }
             }
             else
             {
                 socialNetwork.Add(a, new Dictionary<Agent, double>());
-                socialNetwork[a].Add(b, Math.Max(0, connection));
+                socialNetwork[a].Add(b, connection);
                    
             }
         }

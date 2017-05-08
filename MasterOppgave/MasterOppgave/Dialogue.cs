@@ -15,8 +15,8 @@ namespace LanguageEvolution
 
         public Agent selectSpeaker(List<Agent> agents)
         {
-            Random rng = new Random();
-            return agents[rng.Next(0, agents.Count - 1)];
+            
+            return agents[EALoop.RandomInt(0, agents.Count - 1)];
         }
 
         public Agent selectListener(Agent agent, SocialNetwork net, List<Agent> population)
@@ -24,14 +24,13 @@ namespace LanguageEvolution
             var genome = agent.getGenome().getValuesGenome();
             double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
             Dictionary<Agent, double> connections = net.getAgentsConnections(agent);
-            Random r = new Random();
-            if (r.NextDouble() <= P_extrovert || net.getAgentsConnections(agent) == null)
+            if (EALoop.RandomDouble() <= P_extrovert || net.getAgentsConnections(agent) == null)
             {
                 // Extrovert
-                Agent listener = population[r.Next(0, population.Count)];
+                Agent listener = population[EALoop.RandomInt(0, population.Count)];
                 while (listener == agent)
                 {
-                    listener = population[r.Next(0, population.Count)];
+                    listener = population[EALoop.RandomInt(0, population.Count)];
                 }
                 return listener;
             }
@@ -41,7 +40,7 @@ namespace LanguageEvolution
             {
                 sum += friend.Value;
             }
-            double random = r.NextDouble();
+            double random = EALoop.RandomDouble();
             double to = 0;
             foreach(var friend in connections)
             {
@@ -65,13 +64,11 @@ namespace LanguageEvolution
 
             double sum = 0;
             var sortedDict = from entry in vocabulary orderby entry.Value descending select entry;
-            //sortedDict.Reverse();
             foreach (var i in sortedDict)
             {
                 sum += i.Value;
             }
-            Random rng = new Random();
-            double rnd = rng.NextDouble();
+            double rnd = EALoop.RandomDouble();
             double prob = 0;
             
             foreach (var i in sortedDict)
@@ -88,12 +85,11 @@ namespace LanguageEvolution
         }
         private string newWord()
         {
-            Random rng = new Random();
-            int length = rng.Next(1, 10);
+            int length = EALoop.RandomInt(1,5);
             string word = "";
             for (int i = 0; i < length; i++)
             {
-                int n = rng.Next(0, 26);
+                int n = EALoop.RandomInt(0, 26);
                 word += newLetter(n);
             }
             return word;
