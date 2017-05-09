@@ -1,18 +1,39 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace LanguageEvolution
 {
     public class DataCollector
     {
+        private List<int> uniqueWords;
         private List<double> averageFitness;
         private List<double> dialogues;
         private List<double> degree;
 
         public DataCollector()
         {
+            uniqueWords = new List<int>();
             degree = new List<double>();
             averageFitness = new List<double>();
             dialogues = new List<double>();
+        }
+        public void setUniqueWords(List<Agent> p)
+        {
+            List<string> unique = new List<string>();
+            foreach(Agent a in p)
+            {
+                var sortedDict = from entry in a.getVocabulary().getVocabulary() orderby entry.Value descending select entry;              
+                if (!(unique.Contains(sortedDict.ToArray()[0].Key)))
+                {
+                    unique.Add(sortedDict.ToArray()[0].Key);
+                }
+            }
+            System.Console.WriteLine("unique top rated words: "+ unique.Count);
+            uniqueWords.Add(unique.Count);
+        }
+        public List<int> getUniqueWords()
+        {
+            return uniqueWords;
         }
         public void setDegree(SocialNetwork n)
         {
@@ -74,6 +95,13 @@ namespace LanguageEvolution
                 data += d.ToString() + ",";
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\DegreeData.txt", data);
+
+            data = "";
+            foreach (int d in uniqueWords)
+            {
+                data += d.ToString() + ",";
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\UniqueWordsData.txt", data);
         }
     }
 }

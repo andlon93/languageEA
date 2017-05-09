@@ -34,7 +34,7 @@ namespace LanguageEvolution
             {
                 vocabulary.Add(word, weight);
             }
-            var sortedDict = from entry in vocabulary orderby entry.Value ascending select entry;
+            //var sortedDict = from entry in vocabulary orderby entry.Value ascending select entry;
         }
     }
 }

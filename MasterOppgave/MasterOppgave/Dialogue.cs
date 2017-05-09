@@ -80,8 +80,6 @@ namespace LanguageEvolution
                 }
             }
             return sortedDict.ElementAt(0).Key;
-            //Console.WriteLine("-null- is returned. SOMETHING IS WRONG");
-            //return null;
         }
         private string newWord()
         {

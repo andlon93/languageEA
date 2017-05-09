@@ -38,6 +38,8 @@ namespace LanguageEvolution
             //Console.WriteLine("size of population: " + population.Count);
             ea.dialogueThreads(socialNetwork, population);
             data.setDialogues(ea.succcessfullDialogues / (numThreads * d));
+            data.setDegree(socialNetwork);
+            data.setUniqueWords(population);
             ea.fitnessOfPopulation(population, socialNetwork);
             data.addFitnessData(population);
             ea.updateAges(population);
@@ -55,6 +57,7 @@ namespace LanguageEvolution
                 ea.dialogueThreads(socialNetwork, population);
                 data.setDialogues(ea.succcessfullDialogues / (population.Count * d));
                 data.setDegree(socialNetwork);
+                data.setUniqueWords(population);
                 ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
 
