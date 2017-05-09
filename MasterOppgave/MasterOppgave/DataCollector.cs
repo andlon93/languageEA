@@ -20,15 +20,19 @@ namespace LanguageEvolution
         public void setUniqueWords(List<Agent> p)
         {
             List<string> unique = new List<string>();
-            foreach(Agent a in p)
+            foreach (Agent a in p)
             {
-                var sortedDict = from entry in a.getVocabulary().getVocabulary() orderby entry.Value descending select entry;              
-                if (!(unique.Contains(sortedDict.ToArray()[0].Key)))
+                if(a.getVocabulary().getVocabulary().Count > 0)
                 {
-                    unique.Add(sortedDict.ToArray()[0].Key);
+                    var sortedDict = from entry in a.getVocabulary().getVocabulary() orderby entry.Value descending select entry;
+                    if (!(unique.Contains(sortedDict.ToArray()[0].Key)))
+                    {
+                        unique.Add(sortedDict.ToArray()[0].Key);
+                    }
                 }
+                
             }
-            System.Console.WriteLine("unique top rated words: "+ unique.Count);
+            System.Console.WriteLine("Unique top rated words: "+ unique.Count);
             uniqueWords.Add(unique.Count);
         }
         public List<int> getUniqueWords()

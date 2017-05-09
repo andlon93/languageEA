@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
 
 namespace LanguageEvolution
 {
@@ -28,13 +27,17 @@ namespace LanguageEvolution
         {
             if (vocabulary.ContainsKey(word))
             {
-                vocabulary[word] = Math.Max(0, vocabulary[word] += weight);
+                vocabulary[word] = vocabulary[word] += weight;
             }
             else
             {
                 vocabulary.Add(word, weight);
             }
-            //var sortedDict = from entry in vocabulary orderby entry.Value ascending select entry;
+            if(vocabulary.Count > 10)
+            {
+                var sortedDict = from entry in vocabulary orderby entry.Value ascending select entry;
+                vocabulary.Remove(sortedDict.ElementAt(0).Key);
+            }
         }
     }
 }

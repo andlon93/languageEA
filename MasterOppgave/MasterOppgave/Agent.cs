@@ -34,7 +34,8 @@ namespace LanguageEvolution
             double sumOfAllWeights = 0;
             double NStrongWeights = 0;
 
-            foreach (var i in connections){
+            foreach (var i in connections)
+            {
                 double weight = i.Value;
                 sumOfAllWeights += weight;
                 if (wMax < weight) { wMax = weight; }

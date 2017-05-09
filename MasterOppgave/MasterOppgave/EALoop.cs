@@ -9,12 +9,12 @@ namespace LanguageEvolution
     {
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
-        public static int populationSize = 1225;
+        public static int populationSize = 1000;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
-        public int k = 5;
+        public int k = 20;
         public double eps = 0.2;
-        public static int d = 5;
+        public static int d = 1;
         public static int Totalgenerations = 100;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
@@ -73,7 +73,7 @@ namespace LanguageEvolution
 
                 generations++;
             }
-            Console.WriteLine("fitness data: " + data.getFitnessdata().Count + "\ndialogue data: " + data.getDialogues().Count);
+            Console.WriteLine("fitness data: " + data.getFitnessdata().Count + "\ndialogue data: " + data.getDialogues().Count + "\nUnique words data: " + data.getUniqueWords().Count);
             data.writeToFiles();
             Console.Write("Press any button to end");
         }
