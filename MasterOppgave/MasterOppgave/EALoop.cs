@@ -54,6 +54,7 @@ namespace LanguageEvolution
                 //--    PERFORM DIALOGUES   --//
                 ea.dialogueThreads(socialNetwork, population);
                 data.setDialogues(ea.succcessfullDialogues / (population.Count * d));
+                data.setDegree(socialNetwork);
                 ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
 

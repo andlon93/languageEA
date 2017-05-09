@@ -6,13 +6,30 @@ namespace LanguageEvolution
     {
         private List<double> averageFitness;
         private List<double> dialogues;
+        private List<double> degree;
 
         public DataCollector()
         {
+            degree = new List<double>();
             averageFitness = new List<double>();
             dialogues = new List<double>();
         }
-
+        public void setDegree(SocialNetwork n)
+        {
+            double degreeSum = 0;
+            double pop = 0;
+            foreach(var a in n.socialNetwork)
+            {
+                pop++;
+                degreeSum += a.Value.Count;
+            }
+            //System.Console.WriteLine("average degree: " + (degreeSum / pop) + " " + degreeSum + " " + pop);
+            degree.Add(degreeSum / pop);
+        }
+        public List<double> getDegree()
+        {
+            return degree;
+        }
         public void setDialogues(double n)
         {
             dialogues.Add(n);
@@ -50,6 +67,13 @@ namespace LanguageEvolution
                 data += d.ToString() + ",";
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\DialogueData.txt", data);
+
+            data = "";
+            foreach (double d in degree)
+            {
+                data += d.ToString() + ",";
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\DegreeData.txt", data);
         }
     }
 }
