@@ -13,10 +13,24 @@ namespace LanguageEvolution
 
         }
 
-        public Agent selectSpeaker(List<Agent> agents)
+        public Agent selectSpeaker(List<Agent> pop)
         {
-            
-            return agents[EALoop.RandomInt(0, agents.Count - 1)];
+            double sum = 0;
+            foreach(Agent a in pop)
+            {
+                sum += a.getFitness();
+            }
+            double rnd = EALoop.RandomDouble();
+            double n = 0;
+            foreach(Agent a in pop)
+            {
+                n += a.getFitness() / sum;
+                if(rnd <= n)
+                {
+                    return a;
+                }
+            }
+            return pop[EALoop.RandomInt(0,pop.Count)];
         }
 
         public Agent selectListener(Agent agent, SocialNetwork net, List<Agent> population)
