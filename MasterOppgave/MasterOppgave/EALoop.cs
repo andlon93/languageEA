@@ -9,7 +9,7 @@ namespace LanguageEvolution
     {
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
-        public static int populationSize = 1000;
+        public static int populationSize = 100;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
         public int k = 20;
