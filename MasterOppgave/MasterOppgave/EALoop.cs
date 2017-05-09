@@ -18,6 +18,7 @@ namespace LanguageEvolution
         public static int Totalgenerations = 100;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
+        public double succcessfullDialogues = 0;
 
         static void Main(string[] args)
         {
@@ -28,6 +29,7 @@ namespace LanguageEvolution
             DataCollector data = new DataCollector();
             List<Agent> population = new List<Agent>();
             Dialogue dialogue = new Dialogue();
+            
 
             for (int i = 0; i < populationSize; i++)
             {
@@ -35,6 +37,7 @@ namespace LanguageEvolution
             }
             //Console.WriteLine("size of population: " + population.Count);
             ea.dialogueThreads(socialNetwork, population);
+            data.setDialogues(ea.succcessfullDialogues / (numThreads * d));
             ea.fitnessOfPopulation(population, socialNetwork);
             data.addFitnessData(population);
             ea.updateAges(population);
@@ -50,6 +53,8 @@ namespace LanguageEvolution
 
                 //--    PERFORM DIALOGUES   --//
                 ea.dialogueThreads(socialNetwork, population);
+                data.setDialogues(ea.succcessfullDialogues / (population.Count * d));
+                ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
 
                 //--    CALCULATE FITNESS   --//
@@ -64,8 +69,8 @@ namespace LanguageEvolution
 
                 generations++;
             }
-            Console.WriteLine("fitness data: " + data.getFitnessdata().Count);
-            data.writeFitnessToFile();
+            Console.WriteLine("fitness data: " + data.getFitnessdata().Count + "\ndialogue data: " + data.getDialogues().Count);
+            data.writeToFiles();
             Console.Write("Press any button to end");
         }
 
@@ -131,7 +136,7 @@ namespace LanguageEvolution
         public void dialogueThreads(SocialNetwork socialNetwork, List<Agent> population)
         {
             List<Thread> ts = new List<Thread>();
-            for (int i = 0; i < numThreads*d; i++)
+            for (int i = 0; i < population.Count*d; i++)
             {
                 Thread t = new Thread(new ThreadStart(() => performDialogues(socialNetwork, population)));
                 t.Name = String.Format("t{0}", i + 1);
@@ -157,7 +162,6 @@ namespace LanguageEvolution
                 }
             }
             performDialogue(speaker, listener, socialNetwork);
-
         }
 
         private void performDialogue(Agent speaker, Agent listener, SocialNetwork socialNetwork)
@@ -172,15 +176,16 @@ namespace LanguageEvolution
                 isSuccess = true;
                 speaker.getVocabulary().updateVocabulary(utterance, 1);
                 listener.getVocabulary().updateVocabulary(utterance, 1);
+                succcessfullDialogues++;
             }
             else
             {
-                speaker.getVocabulary().updateVocabulary(utterance, 0);
-                listener.getVocabulary().updateVocabulary(utterance, 0);
+                speaker.getVocabulary().updateVocabulary(utterance, -0.5);
+                listener.getVocabulary().updateVocabulary(utterance, -0.5);
             }
 
-            //speaker.updatepersonality(listener, isSuccess);
-            //listener.updatepersonality(speaker, isSuccess);
+            speaker.updatepersonality(listener, isSuccess);
+            listener.updatepersonality(speaker, isSuccess);
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
