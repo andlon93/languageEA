@@ -27,7 +27,7 @@ namespace LanguageEvolution
             age = 1;
         }
 
-        public double calculateFitness(Dictionary<Agent, double> connections, double maxDegree)
+        public double calculateFitness(Dictionary<Agent, double> connections, double avgDegree, double averageWeight)
         {
             if(connections == null || connections.Count == 0) { return 0; }
 
@@ -45,10 +45,10 @@ namespace LanguageEvolution
             }
             //Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
             if (wMax == 0 || numConnections == 0) { return 0; }
-            double weightFitness = (sumOfAllWeights / (wMax * numConnections)) * EALoop.alpha;
-            double degreeFitness = (NStrongWeights / maxDegree) * EALoop.beta;
+            double weightFitness = (sumOfAllWeights / (averageWeight * numConnections)) * EALoop.alpha;
+            double degreeFitness = (NStrongWeights / avgDegree) * EALoop.beta;
             double ageFitness = Math.Exp(-0.05 * getAge()) * EALoop.gamma;
-            return Math.Round(weightFitness*degreeFitness*ageFitness, 2);
+            return Math.Round((weightFitness*EALoop.alpha)*(degreeFitness*EALoop.beta)*(ageFitness*EALoop.gamma), 5);
         }
 
         public void updatepersonality(Agent partner, bool isSuccess)

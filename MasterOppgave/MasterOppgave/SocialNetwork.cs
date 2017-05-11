@@ -51,10 +51,6 @@ namespace LanguageEvolution
                 socialNetwork[a].Add(b, connection);
                    
             }
-            if (socialNetwork[a][b] < 0)
-            {
-                socialNetwork[a].Remove(b);
-            }
         }
     }
 }

@@ -87,31 +87,31 @@ namespace LanguageEvolution
         public void writeToFiles()
         {
             string data = "";
-            string add = "\n";
+            string separator = "\n";
             foreach(double f in averageFitness)
             {
-                data += f.ToString() + add;
+                data += f.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\FitnessData.txt", data);
 
             data = "";
             foreach(double d in dialogues)
             {
-                data += d.ToString() + add;
+                data += d.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\DialogueData.txt", data);
 
             data = "";
             foreach (double d in degree)
             {
-                data += d.ToString() + add;
+                data += d.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\DegreeData.txt", data);
 
             data = "";
             foreach (int d in uniqueWords)
             {
-                data += d.ToString() + add;
+                data += d.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\UniqueWordsData.txt", data);
         }

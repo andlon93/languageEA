@@ -158,16 +158,25 @@ namespace LanguageEvolution
         private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork)
         {
             double allConnections = 0;
+            double allWeights = 0;
             foreach(Agent a in population)
             {
                 if (socialNetwork.getAgentsConnections(a) != null)
                 {
-                    allConnections += socialNetwork.getAgentsConnections(a).Count;
+                    //allConnections += socialNetwork.getAgentsConnections(a).Count;
+                    foreach(var i in socialNetwork.getAgentsConnections(a))
+                    {
+                        if(i.Value > 0.0)
+                        {
+                            allConnections++;
+                        }
+                        allWeights += i.Value;
+                    }
                 }
             }
             foreach (Agent a in population)
             {
-                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a), (allConnections/population.Count));
+                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a), (allConnections/population.Count), (allWeights/population.Count));
                 //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
@@ -210,29 +219,29 @@ namespace LanguageEvolution
         {
             Dialogue dialogue = new Dialogue();
             string utterance = dialogue.utterWord(speaker);
-            //bool isSuccess = false;
+            bool isSuccess = false;
 
             diaMut.WaitOne(); 
             if (!(listener.getVocabulary().getVocabulary() == null) && listener.getVocabulary().getVocabulary().ContainsKey(utterance))
             {
-                //isSuccess = true;
-                speaker.getVocabulary().updateVocabulary(utterance, getWeight(speaker, true));
-                listener.getVocabulary().updateVocabulary(utterance, getWeight(listener, true));
+                isSuccess = true;
                 speaker.updateDialogs(true);
-                //succcessfullDialogues++;
+                speaker.getVocabulary().updateVocabulary(utterance, 1);
+                listener.getVocabulary().updateVocabulary(utterance, 1);
+                succcessfullDialogues++;
             }
             else
             {
                 speaker.updateDialogs(false);
-                speaker.getVocabulary().updateVocabulary(utterance, -1*getWeight(speaker, true));
-                listener.getVocabulary().updateVocabulary(utterance, -1*getWeight(listener, true));
+                speaker.getVocabulary().updateVocabulary(utterance, -0.5);
+                listener.getVocabulary().updateVocabulary(utterance, -0.5);
             }
 
-            //speaker.updatepersonality(listener, isSuccess);
-            //listener.updatepersonality(speaker, isSuccess);
+            speaker.updatepersonality(listener, isSuccess);
+            listener.updatepersonality(speaker, isSuccess);
 
-            socialNetwork.setConnection(speaker, listener, 1);
-            socialNetwork.setConnection(listener, speaker, -0.5);
+            socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
+            socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
             diaMut.ReleaseMutex();
         }
 
@@ -241,11 +250,11 @@ namespace LanguageEvolution
             if (isSuccess)
             {
                 //return 1;
-                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7];
+                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
             }
             //return -0.5;
-            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7];
-            //if (weight < 0) { return 0; }
+            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 0.5;
+            if (weight < 0) { return 0; }
             return weight;
         }
 
@@ -334,7 +343,7 @@ namespace LanguageEvolution
             childGenome.Add(aGenome[7]);
             childGenome.Add(bGenome[8]);
             childGenome.Add(bGenome[9]);
-            
+
             return new Agent(childGenome);
         }
 
