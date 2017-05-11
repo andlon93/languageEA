@@ -38,7 +38,7 @@ namespace LanguageEvolution
             {
                 if (socialNetwork[a].ContainsKey(b))
                 {
-                    socialNetwork[a][b] += connection;//Math.Max(0, connection);
+                    socialNetwork[a][b] += connection;    
                 }
                 else
                 {
@@ -50,6 +50,10 @@ namespace LanguageEvolution
                 socialNetwork.Add(a, new Dictionary<Agent, double>());
                 socialNetwork[a].Add(b, connection);
                    
+            }
+            if (socialNetwork[a][b] < 0)
+            {
+                socialNetwork[a].Remove(b);
             }
         }
     }

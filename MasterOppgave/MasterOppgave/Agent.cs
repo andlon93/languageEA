@@ -10,6 +10,9 @@ namespace LanguageEvolution
         public Genome genome;
         public int age;
         public Vocabulary vocabulary;
+        private int z = 0;
+        public double succesfullDialogs = 0;
+        public double totDialogs = 0;
         public Agent(List<double> genomeValues)
         {
             genome = new Genome(genomeValues);
@@ -24,7 +27,7 @@ namespace LanguageEvolution
             age = 1;
         }
 
-        public double calculateFitness(Dictionary<Agent, double> connections)
+        public double calculateFitness(Dictionary<Agent, double> connections, double maxDegree)
         {
             if(connections == null || connections.Count == 0) { return 0; }
 
@@ -33,17 +36,19 @@ namespace LanguageEvolution
             double N = EALoop.populationSize;
             double sumOfAllWeights = 0;
             double NStrongWeights = 0;
-
             foreach (var i in connections)
             {
                 double weight = i.Value;
                 sumOfAllWeights += weight;
                 if (wMax < weight) { wMax = weight; }
-                if(weight > 0.5) { NStrongWeights += 1; }
+                if(weight > 0.0) { NStrongWeights += 1; }
             }
             //Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
             if (wMax == 0 || numConnections == 0) { return 0; }
-            return (sumOfAllWeights/(wMax*numConnections)) * (NStrongWeights / (N-1)) * Math.Exp(-0.05*getAge());
+            double weightFitness = (sumOfAllWeights / (wMax * numConnections)) * EALoop.alpha;
+            double degreeFitness = (NStrongWeights / maxDegree) * EALoop.beta;
+            double ageFitness = Math.Exp(-0.05 * getAge()) * EALoop.gamma;
+            return Math.Round(weightFitness*degreeFitness*ageFitness, 2);
         }
 
         public void updatepersonality(Agent partner, bool isSuccess)
@@ -60,6 +65,16 @@ namespace LanguageEvolution
         }
 
         //-- getters and setters --//
+        public void updateDialogs(bool isSuccess)
+        {
+            if (isSuccess) { succesfullDialogs++; }
+            totDialogs++;
+        }
+        public double getSuccDia() { return succesfullDialogs; }
+        public double getTotDialogs() { return totDialogs; }
+        public void nulstillDialogs() { succesfullDialogs = 0; totDialogs = 0; }
+        public void incrementZ() { z++; }
+        public int getZ() { return z; }
         public void setFitness(double fitness){this.fitness = fitness;}
         public double getFitness(){return fitness;}
         public int getAge() { return age;}

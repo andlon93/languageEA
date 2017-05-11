@@ -32,7 +32,6 @@ namespace LanguageEvolution
                 }
                 
             }
-            System.Console.WriteLine("Unique top rated words: "+ unique.Count);
             uniqueWords.Add(unique.Count);
         }
         public List<int> getUniqueWords()
@@ -55,9 +54,17 @@ namespace LanguageEvolution
         {
             return degree;
         }
-        public void setDialogues(double n)
+        public void setDialogues(List<Agent> p)
         {
-            dialogues.Add(n);
+            double succesfull = 0;
+            double tot = 0;
+            foreach(Agent a in p)
+            {
+                succesfull += a.getSuccDia();
+                tot += a.getTotDialogs();
+                a.nulstillDialogs();
+            }
+            dialogues.Add(succesfull / tot);
         }
         public List<double> getDialogues()
         {

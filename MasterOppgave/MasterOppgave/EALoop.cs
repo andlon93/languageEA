@@ -9,7 +9,8 @@ namespace LanguageEvolution
     {
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
-        public static int populationSize = 100;
+        public static int populationSize = 1000;
+        public static int childrenToMake = 500;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
         public int k = 20;
@@ -19,7 +20,8 @@ namespace LanguageEvolution
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
         public double succcessfullDialogues = 0;
-
+        public static double alpha = 1; public static double beta = 1; public static double gamma = 1;
+        
         static void Main(string[] args)
         {
             EALoop ea = new EALoop();
@@ -37,12 +39,18 @@ namespace LanguageEvolution
             }
             //Console.WriteLine("size of population: " + population.Count);
             ea.dialogueThreads(socialNetwork, population);
-            data.setDialogues(ea.succcessfullDialogues / (numThreads * d));
-            data.setDegree(socialNetwork);
-            data.setUniqueWords(population);
+
             ea.fitnessOfPopulation(population, socialNetwork);
-            data.addFitnessData(population);
+
+            //population = ea.survivalSelection(populationSize, population, socialNetwork);
+
+            //data.addFitnessData(population);
+            //data.setDialogues(ea.succcessfullDialogues / (numThreads * d));
+            //data.setDegree(socialNetwork);
+            //data.setUniqueWords(population);
+
             ea.updateAges(population);
+
             int generations = 1;
             while (generations < Totalgenerations)
             {
@@ -51,13 +59,11 @@ namespace LanguageEvolution
 
                 //--   MAKE CHILDREN   --//
                 population.AddRange(ea.makeChildren(population, socialNetwork));
-                //Console.WriteLine("Size of population after children was made: " + population.Count);
+                Console.WriteLine("Size of population after children was made: " + population.Count);
 
                 //--    PERFORM DIALOGUES   --//
                 ea.dialogueThreads(socialNetwork, population);
-                data.setDialogues(ea.succcessfullDialogues / (population.Count * d));
-                data.setDegree(socialNetwork);
-                data.setUniqueWords(population);
+                
                 ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
 
@@ -68,6 +74,9 @@ namespace LanguageEvolution
                 //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(populationSize, population, socialNetwork);
                 ea.updateAges(population);
+                data.setDialogues(population);
+                data.setDegree(socialNetwork);
+                data.setUniqueWords(population);
                 data.addFitnessData(population);
                 //Console.WriteLine("Size of population after survival selection: " + population.Count);
 
@@ -92,7 +101,7 @@ namespace LanguageEvolution
             List<Agent> Children = new List<Agent>();
             List<Thread> ts = new List<Thread>();
             
-            for(int i = 0; i < numThreads; i++)
+            for(int i = 0; i < (childrenToMake); i++)
             {
                 Thread t = new Thread(new ThreadStart(() => Children.AddRange(ea.breed(population, socialNetwork))));
                 t.Name = String.Format("t{0}", i + 1);
@@ -114,12 +123,33 @@ namespace LanguageEvolution
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
                 Agent child = crossover(parent1, parent2);
-                breedMut.WaitOne(); // MUTEX start
-                performDialogue(parent1, child, socialNetwork);
-                performDialogue(parent2, child, socialNetwork);
-                performDialogue(parent1, child, socialNetwork);
-                performDialogue(parent2, child, socialNetwork);
-                breedMut.ReleaseMutex(); // MUTEX end
+                if (RandomDouble() < 0.512)
+                {
+                    breedMut.WaitOne(); // MUTEX start
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    breedMut.ReleaseMutex(); // MUTEX end
+                }
+                else if (RandomDouble() < 0.64)
+                {
+                    breedMut.WaitOne(); // MUTEX start
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    breedMut.ReleaseMutex(); // MUTEX end
+                }
+                else if (RandomDouble() < 0.8)
+                {
+                    breedMut.WaitOne(); // MUTEX start
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    breedMut.ReleaseMutex(); // MUTEX end
+                }
                 children.Add(child);
             }
             return children;
@@ -127,10 +157,18 @@ namespace LanguageEvolution
 
         private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork)
         {
+            double allConnections = 0;
+            foreach(Agent a in population)
+            {
+                if (socialNetwork.getAgentsConnections(a) != null)
+                {
+                    allConnections += socialNetwork.getAgentsConnections(a).Count;
+                }
+            }
             foreach (Agent a in population)
             {
-                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
-                // Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
+                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a), (allConnections/population.Count));
+                //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
             population = population.OrderBy(agent => agent.getFitness()).ToList();
@@ -172,27 +210,29 @@ namespace LanguageEvolution
         {
             Dialogue dialogue = new Dialogue();
             string utterance = dialogue.utterWord(speaker);
-            bool isSuccess = false;
+            //bool isSuccess = false;
 
             diaMut.WaitOne(); 
             if (!(listener.getVocabulary().getVocabulary() == null) && listener.getVocabulary().getVocabulary().ContainsKey(utterance))
             {
-                isSuccess = true;
-                speaker.getVocabulary().updateVocabulary(utterance, 1);
-                listener.getVocabulary().updateVocabulary(utterance, 1);
-                succcessfullDialogues++;
+                //isSuccess = true;
+                speaker.getVocabulary().updateVocabulary(utterance, getWeight(speaker, true));
+                listener.getVocabulary().updateVocabulary(utterance, getWeight(listener, true));
+                speaker.updateDialogs(true);
+                //succcessfullDialogues++;
             }
             else
             {
-                speaker.getVocabulary().updateVocabulary(utterance, -0.5);
-                listener.getVocabulary().updateVocabulary(utterance, -0.5);
+                speaker.updateDialogs(false);
+                speaker.getVocabulary().updateVocabulary(utterance, -1*getWeight(speaker, true));
+                listener.getVocabulary().updateVocabulary(utterance, -1*getWeight(listener, true));
             }
 
-            speaker.updatepersonality(listener, isSuccess);
-            listener.updatepersonality(speaker, isSuccess);
+            //speaker.updatepersonality(listener, isSuccess);
+            //listener.updatepersonality(speaker, isSuccess);
 
-            socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
-            socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
+            socialNetwork.setConnection(speaker, listener, 1);
+            socialNetwork.setConnection(listener, speaker, -0.5);
             diaMut.ReleaseMutex();
         }
 
@@ -201,11 +241,11 @@ namespace LanguageEvolution
             if (isSuccess)
             {
                 //return 1;
-                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
+                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7];
             }
             //return -0.5;
-            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 0.5;
-            if (weight < 0) { return 0; }
+            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7];
+            //if (weight < 0) { return 0; }
             return weight;
         }
 
@@ -215,8 +255,8 @@ namespace LanguageEvolution
             List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
             //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
             sortedList.Reverse();
-            Console.WriteLine("fitnesses: " + sortedList[0].getFitness() + "  " + sortedList[sortedList.Count - 1].getFitness());
-            deadAgents = sortedList.GetRange(populationSize, populationSize);
+            //Console.WriteLine("fitnesses: " + sortedList[0].getFitness() + "  " + sortedList[sortedList.Count - 1].getFitness());
+            deadAgents = sortedList.GetRange(populationSize, childrenToMake);
             removeDeadAgents(socialNetwork, deadAgents, populationSize);
 
             return sortedList.GetRange(0, populationSize);
@@ -294,7 +334,7 @@ namespace LanguageEvolution
             childGenome.Add(aGenome[7]);
             childGenome.Add(bGenome[8]);
             childGenome.Add(bGenome[9]);
-
+            
             return new Agent(childGenome);
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace LanguageEvolution
@@ -7,6 +6,7 @@ namespace LanguageEvolution
     public class Dialogue
     {
         public double C = 0.25;
+        //private int maxExtroConv = ;
 
         public Dialogue()
         {
@@ -38,7 +38,8 @@ namespace LanguageEvolution
             var genome = agent.getGenome().getValuesGenome();
             double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
             Dictionary<Agent, double> connections = net.getAgentsConnections(agent);
-            if (EALoop.RandomDouble() <= P_extrovert || net.getAgentsConnections(agent) == null)
+            //if ((EALoop.RandomDouble() <= P_extrovert && agent.getZ() < maxExtroConv) || net.getAgentsConnections(agent) == null)
+            if ((EALoop.RandomDouble() <= P_extrovert) || net.getAgentsConnections(agent) == null) 
             {
                 // Extrovert
                 Agent listener = population[EALoop.RandomInt(0, population.Count)];
@@ -46,6 +47,7 @@ namespace LanguageEvolution
                 {
                     listener = population[EALoop.RandomInt(0, population.Count)];
                 }
+                //agent.incrementZ();
                 return listener;
             }
             // Introvert
@@ -93,7 +95,7 @@ namespace LanguageEvolution
                     return i.Key;
                 }
             }
-            return sortedDict.ElementAt(0).Key;
+            return vocabulary.ElementAt(EALoop.RandomInt(0, vocabulary.Count)).Key;
         }
         private string newWord()
         {
