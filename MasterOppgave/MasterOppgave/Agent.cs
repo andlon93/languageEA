@@ -59,13 +59,40 @@ namespace LanguageEvolution
         {
             if(isSuccess)
             {
-                List<double> values = this.getGenome().getValuesGenome();
+                List<double> values = getGenome().getValuesGenome();
                 List<double> partnerValues = partner.getGenome().getValuesGenome();
+                List<double> newValues = new List<double>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                 for (int i = 0; i < values.Count; i++)
                 {
-                    values[i] += (( (partnerValues[i] - values[i]) / this.getAge() ) * 0.5);
+                    newValues[i] += (( (partnerValues[i] - values[i]) / getAge() ) * 0.5);
                 }
+                double newLR = newValues[0] + newValues[8] + newValues[9] -
+                               newValues[4] - newValues[1] - newValues[7];
+                double oldLR = values[0] + values[8] + values[9] -
+                               values[4] - values[1] - values[7];
+                if(newLR > oldLR)
+                {
+                    //values[0] = newValues[0];
+                    //values[8] = newValues[8];
+                    //values[9] = newValues[9];
+                    //values[4] = newValues[4];
+                    //values[1] = newValues[1];
+                    //values[7] = newValues[7];
+                    if (newValues[0] > values[0]) { values[0] = newValues[0]; }
+                    if (newValues[8] > values[8]) { values[8] = newValues[8]; }
+                    if (newValues[9] > values[9]) { values[9] = newValues[9]; }
+                    if (newValues[4] < values[4]) { values[4] = newValues[4]; }
+                    if (newValues[1] < values[1]) { values[1] = newValues[1]; }
+                    if (newValues[7] < values[7]) { values[7] = newValues[7]; }
+                }
+                //if (newValues[0] > values[0]) { values[0] = newValues[0]; }
+                //if (newValues[8] > values[8]) { values[8] = newValues[8]; }
+                //if (newValues[9] > values[9]) { values[9] = newValues[9]; }
+                //if (newValues[4] < values[4]) { values[4] = newValues[4]; }
+                //if (newValues[1] < values[1]) { values[1] = newValues[1]; }
+                //if (newValues[7] < values[7]) { values[7] = newValues[7]; }
             }
+            
         }
 
         //-- getters and setters --//

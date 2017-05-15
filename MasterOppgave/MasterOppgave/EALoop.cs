@@ -268,8 +268,8 @@ namespace LanguageEvolution
                 listener.getVocabulary().updateVocabulary(utterance, Math.Max(0, i2));
             }
 
-            //speaker.updatepersonality(listener, isSuccess);
-            //listener.updatepersonality(speaker, isSuccess);
+            speaker.updatepersonality(listener, isSuccess);
+            listener.updatepersonality(speaker, isSuccess);
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
