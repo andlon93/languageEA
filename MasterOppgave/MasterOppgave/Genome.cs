@@ -16,7 +16,6 @@ namespace LanguageEvolution
         // Tradition      =   7
         // Benevolence    =   8
         // Univarsalism   =   9
-        // Learnability   =   10
         // equals: 0,1,2 - 2,3,4 - 5,6,7 - 8,9
         // opposites: 0,5 - 1,5 - 2,67 - 3,8 - 4,9
         private List<double> genomeValues;

@@ -13,26 +13,30 @@ namespace LanguageEvolution
         private int z = 0;
         public double succesfullDialogs = 0;
         public double totDialogs = 0;
-        public Agent(List<double> genomeValues)
+        public int ID;
+        public Agent(List<double> genomeValues, int ID)
         {
             genome = new Genome(genomeValues);
             vocabulary = new Vocabulary();
             age = 1;
+            this.ID = ID;
         }
 
-        public Agent()
+        public Agent(int ID)
         {
             genome = new Genome();
             vocabulary = new Vocabulary();
             age = 1;
+            this.ID = ID;
         }
 
-        public double calculateFitness(Dictionary<Agent, double> connections, double avgDegree, double averageWeight)
+        public double calculateFitness(Dictionary<Agent, double> connections)
         {
             if(connections == null || connections.Count == 0) { return 0; }
 
             double wMax = 0.0;
             double numConnections = connections.Count;
+            double numStrongConnections = 0;
             double N = EALoop.populationSize;
             double sumOfAllWeights = 0;
             double NStrongWeights = 0;
@@ -41,14 +45,14 @@ namespace LanguageEvolution
                 double weight = i.Value;
                 sumOfAllWeights += weight;
                 if (wMax < weight) { wMax = weight; }
-                if(weight > 0.0) { NStrongWeights += 1; }
+                if(weight > 0.0) { NStrongWeights++; numStrongConnections++; }
             }
             //Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
-            if (wMax == 0 || numConnections == 0) { return 0; }
-            double weightFitness = (sumOfAllWeights / (averageWeight * numConnections)) * EALoop.alpha;
-            double degreeFitness = (NStrongWeights / avgDegree) * EALoop.beta;
-            double ageFitness = Math.Exp(-0.05 * getAge()) * EALoop.gamma;
-            return Math.Round((weightFitness*EALoop.alpha)*(degreeFitness*EALoop.beta)*(ageFitness*EALoop.gamma), 5);
+            if (numConnections == 0) { return 0; }
+            double weightFitness = Math.Min(Math.Exp( (EALoop.alpha * sumOfAllWeights)) -1, 1);
+            double degreeFitness = Math.Min(Math.Exp(EALoop.beta * NStrongWeights) - 1, 1);
+            double ageFitness = Math.Exp(EALoop.gamma * getAge()) ;
+            return Math.Min(weightFitness*degreeFitness*ageFitness, 1);
         }
 
         public void updatepersonality(Agent partner, bool isSuccess)
@@ -81,6 +85,7 @@ namespace LanguageEvolution
         public void incrementAge() { age++; }
         public Vocabulary getVocabulary(){ return vocabulary; }
         public Genome getGenome() { return genome; }
+        public int getID() { return ID; }
         //public List<Tuple<Agent, double>> getConnections() { return connections; }
         //public void setConnections(List<Tuple<Agent, double>> connections) { this.connections = connections; }
     }

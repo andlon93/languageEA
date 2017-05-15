@@ -9,18 +9,20 @@ namespace LanguageEvolution
     {
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
+        public int AgentIdCounter = 0;
         public static int populationSize = 1000;
         public static int childrenToMake = 500;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
-        public int k = 20;
+        public int k = 900;
+        public int n = 800;
         public double eps = 0.2;
         public static int d = 1;
         public static int Totalgenerations = 100;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
         public double succcessfullDialogues = 0;
-        public static double alpha = 1; public static double beta = 1; public static double gamma = 1;
+        public static double alpha = 0.13; public static double beta = 0.2; public static double gamma = -0.05;
         
         static void Main(string[] args)
         {
@@ -31,59 +33,65 @@ namespace LanguageEvolution
             DataCollector data = new DataCollector();
             List<Agent> population = new List<Agent>();
             Dialogue dialogue = new Dialogue();
-            
+            int generations = 1;
 
             for (int i = 0; i < populationSize; i++)
             {
-                population.Add(new Agent());
+                population.Add(new Agent(ea.AgentIdCounter));
+                ea.AgentIdCounter++;
             }
             //Console.WriteLine("size of population: " + population.Count);
             ea.dialogueThreads(socialNetwork, population);
 
-            ea.fitnessOfPopulation(population, socialNetwork);
+            ea.fitnessOfPopulation(population, socialNetwork, data);
 
-            //population = ea.survivalSelection(populationSize, population, socialNetwork);
+            data.addDiscreteGraph(population, socialNetwork, generations);
+            data.addFitnessData(population);
+            data.setDialogues(population);
+            //data.setDegree(socialNetwork, data);
+            data.setUniqueWords(population);
 
-            //data.addFitnessData(population);
-            //data.setDialogues(ea.succcessfullDialogues / (numThreads * d));
-            //data.setDegree(socialNetwork);
-            //data.setUniqueWords(population);
+            population = ea.survivalSelection(population, socialNetwork);
 
             ea.updateAges(population);
 
-            int generations = 1;
+            
             while (generations < Totalgenerations)
             {
+                generations++;
                 Console.WriteLine("\nGeneration number: " + generations);
                 //Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
                 //--   MAKE CHILDREN   --//
+                //Console.WriteLine("Size of population before children is made: " + population.Count);
                 population.AddRange(ea.makeChildren(population, socialNetwork));
                 Console.WriteLine("Size of population after children was made: " + population.Count);
 
                 //--    PERFORM DIALOGUES   --//
                 ea.dialogueThreads(socialNetwork, population);
                 
-                ea.succcessfullDialogues = 0;
+                //ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
 
                 //--    CALCULATE FITNESS   --//
-                ea.fitnessOfPopulation(population, socialNetwork);
-                //Console.WriteLine("Fitness calculated");
-                
+                ea.fitnessOfPopulation(population, socialNetwork, data);
+
+
+                data.addDiscreteGraph(population, socialNetwork, generations);
+
                 //--    SURVIVAL SELECTION   --//
-                population = ea.survivalSelection(populationSize, population, socialNetwork);
-                ea.updateAges(population);
+                population = ea.survivalSelection(population, socialNetwork);
                 data.setDialogues(population);
-                data.setDegree(socialNetwork);
                 data.setUniqueWords(population);
                 data.addFitnessData(population);
+                
+                ea.updateAges(population);
+                
                 //Console.WriteLine("Size of population after survival selection: " + population.Count);
-
-                generations++;
             }
             Console.WriteLine("fitness data: " + data.getFitnessdata().Count + "\ndialogue data: " + data.getDialogues().Count + "\nUnique words data: " + data.getUniqueWords().Count);
             data.writeToFiles();
+            data.addDiscreteGraph(population, socialNetwork, generations);
             Console.Write("Press any button to end");
         }
 
@@ -100,8 +108,8 @@ namespace LanguageEvolution
             EALoop ea = new EALoop();
             List<Agent> Children = new List<Agent>();
             List<Thread> ts = new List<Thread>();
-            
-            for(int i = 0; i < (childrenToMake); i++)
+            //Console.WriteLine("making " + (populationSize - n )+ " children.");
+            for(int i = 0; i < populationSize-n ; i++)
             {
                 Thread t = new Thread(new ThreadStart(() => Children.AddRange(ea.breed(population, socialNetwork))));
                 t.Name = String.Format("t{0}", i + 1);
@@ -112,13 +120,14 @@ namespace LanguageEvolution
             {
                 t.Join();
             }
+            //Console.WriteLine("Number of children: " + Children.Count);
             return Children;
         }
 
         public List<Agent> breed(List<Agent> pop, SocialNetwork socialNetwork)
         {
             List<Agent> children = new List<Agent>();
-            for (int i = 0; i < pop.Count/numThreads; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
@@ -155,28 +164,42 @@ namespace LanguageEvolution
             return children;
         }
 
-        private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork)
+        private void fitnessOfPopulation(List<Agent> population, SocialNetwork socialNetwork, DataCollector d)
         {
             double allConnections = 0;
-            double allWeights = 0;
-            foreach(Agent a in population)
-            {
-                if (socialNetwork.getAgentsConnections(a) != null)
-                {
-                    //allConnections += socialNetwork.getAgentsConnections(a).Count;
-                    foreach(var i in socialNetwork.getAgentsConnections(a))
-                    {
-                        if(i.Value > 0.0)
-                        {
-                            allConnections++;
-                        }
-                        allWeights += i.Value;
-                    }
-                }
-            }
+            double AvgWeight = 0;
+            
             foreach (Agent a in population)
             {
-                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a), (allConnections/population.Count), (allWeights/population.Count));
+                double agentsAvgWeight = 0;
+                double agentsConnections = 0;
+                if (socialNetwork.getAgentsConnections(a) != null && socialNetwork.getAgentsConnections(a).Count > 0)
+                {   
+                    foreach (var i in socialNetwork.getAgentsConnections(a))
+                    {  
+                        if(i.Value > 0.0)
+                        {
+                            agentsConnections++;
+                            agentsAvgWeight += i.Value;
+                        }   
+                    }
+                    if(agentsConnections > 0)
+                    {
+                        AvgWeight += (agentsAvgWeight / agentsConnections);
+                        allConnections += agentsConnections / 2;
+                    } 
+                    
+                }
+                
+                //Console.WriteLine("All connections: " + allConnections);
+            }
+            Console.WriteLine("All connections: " + (allConnections / population.Count));
+            Console.WriteLine("Agents average weight: " + (AvgWeight / population.Count) + "\n\n");
+            d.setDegree(allConnections / population.Count);
+
+            foreach (Agent a in population)
+            {
+                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
                 //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
                 a.setFitness(fitness);
             }
@@ -226,19 +249,23 @@ namespace LanguageEvolution
             {
                 isSuccess = true;
                 speaker.updateDialogs(true);
-                speaker.getVocabulary().updateVocabulary(utterance, 1);
-                listener.getVocabulary().updateVocabulary(utterance, 1);
+                double i = speaker.getGenome().getNormalisedGenome()[0] + speaker.getGenome().getNormalisedGenome()[8] + speaker.getGenome().getNormalisedGenome()[9] - speaker.getGenome().getNormalisedGenome()[4] - speaker.getGenome().getNormalisedGenome()[1] - speaker.getGenome().getNormalisedGenome()[7];
+                speaker.getVocabulary().updateVocabulary(utterance, Math.Max(0, i));
+                double i2 = listener.getGenome().getNormalisedGenome()[0] + listener.getGenome().getNormalisedGenome()[8] + listener.getGenome().getNormalisedGenome()[9] - listener.getGenome().getNormalisedGenome()[4] - listener.getGenome().getNormalisedGenome()[1] - listener.getGenome().getNormalisedGenome()[7];
+                listener.getVocabulary().updateVocabulary(utterance, Math.Max(0,i2));
                 succcessfullDialogues++;
             }
             else
             {
+                double i = speaker.getGenome().getNormalisedGenome()[0] + speaker.getGenome().getNormalisedGenome()[8] + speaker.getGenome().getNormalisedGenome()[9] - speaker.getGenome().getNormalisedGenome()[4] - speaker.getGenome().getNormalisedGenome()[1] - speaker.getGenome().getNormalisedGenome()[7];
+                double i2 = listener.getGenome().getNormalisedGenome()[0] + listener.getGenome().getNormalisedGenome()[8] + listener.getGenome().getNormalisedGenome()[9] - listener.getGenome().getNormalisedGenome()[4] - listener.getGenome().getNormalisedGenome()[1] - listener.getGenome().getNormalisedGenome()[7];
                 speaker.updateDialogs(false);
-                speaker.getVocabulary().updateVocabulary(utterance, -0.5);
-                listener.getVocabulary().updateVocabulary(utterance, -0.5);
+                speaker.getVocabulary().updateVocabulary(utterance, Math.Min(0, -1*i));
+                listener.getVocabulary().updateVocabulary(utterance, Math.Max(0, i2));
             }
 
-            speaker.updatepersonality(listener, isSuccess);
-            listener.updatepersonality(speaker, isSuccess);
+            //speaker.updatepersonality(listener, isSuccess);
+            //listener.updatepersonality(speaker, isSuccess);
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
@@ -249,26 +276,35 @@ namespace LanguageEvolution
         {
             if (isSuccess)
             {
-                //return 1;
-                return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
+                return 1;
+                //return a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] + 1;
             }
-            //return -0.5;
-            double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 0.5;
-            if (weight < 0) { return 0; }
-            return weight;
+            return -0.5;
+            //double weight = a.getGenome().getNormalisedGenome()[0] + a.getGenome().getNormalisedGenome()[8] + a.getGenome().getNormalisedGenome()[9] - a.getGenome().getNormalisedGenome()[4] - a.getGenome().getNormalisedGenome()[1] - a.getGenome().getNormalisedGenome()[7] - 0.5;
+            //if (weight < 0) { return 0; }
+            //return weight;
         }
 
-        public List<Agent> survivalSelection(int populationSize, List<Agent> population, SocialNetwork socialNetwork)
+        public List<Agent> survivalSelection(List<Agent> population, SocialNetwork socialNetwork)
         {
+
             List<Agent> deadAgents = new List<Agent>();
-            List<Agent> sortedList = population.OrderBy(agent => agent.getFitness()).ToList();
-            //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + population.Count);
+            List<Agent> survivingAgents = new List<Agent>();
+            while(survivingAgents.Count < k)
+            {
+                int i = RandomInt(0, population.Count);
+                survivingAgents.Add(population[i]);
+                population.RemoveAt(i);
+            }
+            
+            List<Agent> sortedList = survivingAgents.OrderBy(agent => agent.getFitness()).ToList();
+            //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + sortedList.Count);
             sortedList.Reverse();
             //Console.WriteLine("fitnesses: " + sortedList[0].getFitness() + "  " + sortedList[sortedList.Count - 1].getFitness());
-            deadAgents = sortedList.GetRange(populationSize, childrenToMake);
-            removeDeadAgents(socialNetwork, deadAgents, populationSize);
+            //deadAgents = sortedList.GetRange(populationSize, childrenToMake);
+            removeDeadAgents(socialNetwork, population, populationSize);
 
-            return sortedList.GetRange(0, populationSize);
+            return sortedList.GetRange(0, n);
         }
 
         private void removeDeadAgents(SocialNetwork socialNetwork, List<Agent> deadAgents, int populationSize)
@@ -297,7 +333,7 @@ namespace LanguageEvolution
         {
             List<Agent> pool = new List<Agent>(k);
             int numberOfAgents = allAgents.Count;
-            while (pool.Count < k)
+            while (pool.Count < 8)
             {
                 int i = RandomInt(0, numberOfAgents);
                 if (!pool.Contains(allAgents[i]))
@@ -343,8 +379,10 @@ namespace LanguageEvolution
             childGenome.Add(aGenome[7]);
             childGenome.Add(bGenome[8]);
             childGenome.Add(bGenome[9]);
-
-            return new Agent(childGenome);
+            Agent child = new Agent(childGenome, AgentIdCounter);
+            AgentIdCounter++;
+            return child;
+            
         }
 
         public static int RandomInt(int min, int max)

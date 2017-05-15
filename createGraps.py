@@ -18,6 +18,7 @@ DegreeData = []
 DialogueData = []
 WordsData = []
 for line in Fitness:
+    print(line)
     FitnessData.append(float(line))
 for line in Degree:
     DegreeData.append(float(line))
@@ -37,12 +38,12 @@ def plot_data(data, x, y, name, filename):
     plt.xlabel(x)#r'Speed $v$ [m/s]', fontsize=30)
     plt.ylabel(y)#r'$f(v)$', fontsize=30)
     plt.xticks(np.arange(0,100,10))
-    plt.yticks(np.linspace(min(data), max(data), 10))
+    plt.yticks(np.linspace(min(data), max(data), 10)    )
     plt.plot(range(len(data)), data, label=name)
     plt.show()
     # --- Saving figure.
     #plt.tight_layout()
-    #plt.savefig(filename)
+    plt.savefig("Data/"+name)
 plot_data(FitnessData, "Number of generations", "Fitness", "Fitness", "tull")
 plot_data(WordsData, "Number of generations", "Number of unique highest ranked words", "unique words", "tull")
 plot_data(DegreeData, "Number of generations", "Average degree", "Average degree per agent", "tull")

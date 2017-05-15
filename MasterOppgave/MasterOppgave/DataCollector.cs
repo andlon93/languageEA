@@ -17,6 +17,32 @@ namespace LanguageEvolution
             averageFitness = new List<double>();
             dialogues = new List<double>();
         }
+
+        public void addDiscreteGraph(List<Agent> pop, SocialNetwork n, int generation)
+        {
+            string s = "";
+            string sep = ",";
+            List<string> addedEdges = new List<string>();
+            foreach (var a in pop)
+            {
+                s += a.getID().ToString() + sep;
+                if (n.getAgentsConnections(a) != null)
+                {
+                    foreach (var b in n.getAgentsConnections(a))
+                    {
+                        if ( b.Value > 0.0 && !(addedEdges.Contains(a.getID().ToString() + b.Key.getID().ToString())) )
+                        {
+                            s += b.Key.getID().ToString() + sep;
+                            addedEdges.Add(a.getID().ToString() + b.Key.getID().ToString());
+                        }
+                    }
+                    s += "\n";
+                }
+            }
+            string filename = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph"+ generation.ToString()+".txt";
+            System.IO.File.WriteAllText(@filename, s);
+        }
+
         public void setUniqueWords(List<Agent> p)
         {
             List<string> unique = new List<string>();
@@ -38,17 +64,9 @@ namespace LanguageEvolution
         {
             return uniqueWords;
         }
-        public void setDegree(SocialNetwork n)
+        public void setDegree(double n)
         {
-            double degreeSum = 0;
-            double pop = 0;
-            foreach(var a in n.socialNetwork)
-            {
-                pop++;
-                degreeSum += a.Value.Count;
-            }
-            //System.Console.WriteLine("average degree: " + (degreeSum / pop) + " " + degreeSum + " " + pop);
-            degree.Add(degreeSum / pop);
+            degree.Add(n);
         }
         public List<double> getDegree()
         {

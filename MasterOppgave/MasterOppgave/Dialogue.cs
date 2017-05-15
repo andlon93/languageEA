@@ -86,7 +86,6 @@ namespace LanguageEvolution
             }
             double rnd = EALoop.RandomDouble();
             double prob = 0;
-            
             foreach (var i in sortedDict)
             {
                 prob += i.Value / sum;
