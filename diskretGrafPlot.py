@@ -17,7 +17,8 @@ def plotting(file, gen):
     d = {}
     for line in opened:
        t = (line.split(','))
-       t.remove('\n')
+       if(t.__contains__('\n')):
+            t.remove('\n')
        d[t[0]] = t[1: len(t)]
 
 
