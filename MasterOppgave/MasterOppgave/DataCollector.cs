@@ -9,9 +9,10 @@ namespace LanguageEvolution
         private List<double> averageFitness;
         private List<double> dialogues;
         private List<double> degree;
-
+        private List<double> learnRate;
         public DataCollector()
         {
+            learnRate = new List<double>();
             uniqueWords = new List<int>();
             degree = new List<double>();
             averageFitness = new List<double>();
@@ -43,6 +44,11 @@ namespace LanguageEvolution
             System.IO.File.WriteAllText(@filename, s);
         }
 
+        public void addLearnRate(double lr)
+        {
+            learnRate.Add(lr);
+        }
+        public List<double> getLearnRate() { return learnRate; }
         public void setUniqueWords(List<Agent> p)
         {
             List<string> unique = new List<string>();
@@ -132,6 +138,13 @@ namespace LanguageEvolution
                 data += d.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\UniqueWordsData.txt", data);
+
+            data = "";
+            foreach (double d in learnRate)
+            {
+                data += d.ToString() + separator;
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\LearnRate.txt", data);
         }
     }
 }

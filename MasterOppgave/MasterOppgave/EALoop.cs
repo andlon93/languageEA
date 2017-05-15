@@ -76,14 +76,14 @@ namespace LanguageEvolution
                 //--    CALCULATE FITNESS   --//
                 ea.fitnessOfPopulation(population, socialNetwork, data);
 
-
+                data.setDialogues(population);
+                data.setUniqueWords(population);
+                data.addFitnessData(population);
                 data.addDiscreteGraph(population, socialNetwork, generations);
 
                 //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(population, socialNetwork);
-                data.setDialogues(population);
-                data.setUniqueWords(population);
-                data.addFitnessData(population);
+
                 
                 ea.updateAges(population);
                 
@@ -168,11 +168,13 @@ namespace LanguageEvolution
         {
             double allConnections = 0;
             double AvgWeight = 0;
-            
+            double learnRateSum = 0;
             foreach (Agent a in population)
             {
                 double agentsAvgWeight = 0;
                 double agentsConnections = 0;
+                List<double> normGenome = a.getGenome().getNormalisedGenome();
+                learnRateSum += (normGenome[0] + normGenome[8] + normGenome[9] - normGenome[4] - normGenome[1] - normGenome[7]);
                 if (socialNetwork.getAgentsConnections(a) != null && socialNetwork.getAgentsConnections(a).Count > 0)
                 {   
                     foreach (var i in socialNetwork.getAgentsConnections(a))
@@ -194,8 +196,10 @@ namespace LanguageEvolution
                 //Console.WriteLine("All connections: " + allConnections);
             }
             Console.WriteLine("All connections: " + (allConnections / population.Count));
-            Console.WriteLine("Agents average weight: " + (AvgWeight / population.Count) + "\n\n");
+            Console.WriteLine("Agents average weight: " + (AvgWeight / population.Count) );
+            Console.WriteLine("Average learn rate: " + (learnRateSum / population.Count) + "\n\n");
             d.setDegree(allConnections / population.Count);
+            d.addLearnRate((learnRateSum / population.Count));
 
             foreach (Agent a in population)
             {
