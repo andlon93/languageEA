@@ -11,18 +11,17 @@ namespace LanguageEvolution
         Mutex diaMut = new Mutex();
         public int AgentIdCounter = 0;
         public static int populationSize = 1000;
-        //public static int childrenToMake = 500;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
-        public int k = 900;
-        public int n = 800;
+        public double k = 0.9;
+        public double n = 0.8;
         public double eps = 0.2;
         public static int d = 1;
-        public static int Totalgenerations = 100;
+        public static int Totalgenerations = 150;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
         public double succcessfullDialogues = 0;
-        public static double alpha = 0.35; public static double beta = 0.2; public static double gamma = -0.05;
+        public static double alpha = 0.25; public static double beta = 0.5; public static double gamma = -0.05;
         
         static void Main(string[] args)
         {
@@ -63,7 +62,7 @@ namespace LanguageEvolution
                 //Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
                 //--   MAKE CHILDREN   --//
-                //Console.WriteLine("Size of population before children is made: " + population.Count);
+                Console.WriteLine("Size of population before children is made: " + population.Count);
                 population.AddRange(ea.makeChildren(population, socialNetwork));
                 Console.WriteLine("Size of population after children was made: " + population.Count);
 
@@ -111,7 +110,7 @@ namespace LanguageEvolution
             List<Agent> Children = new List<Agent>();
             List<Thread> ts = new List<Thread>();
             //Console.WriteLine("making " + (populationSize - n )+ " children.");
-            for(int i = 0; i < populationSize-n ; i++)
+            for(int i = population.Count; i < populationSize; i++)
             {
                 Thread t = new Thread(new ThreadStart(() => Children.AddRange(ea.breed(population, socialNetwork))));
                 t.Name = String.Format("t{0}", i + 1);
@@ -134,7 +133,7 @@ namespace LanguageEvolution
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
                 Agent child = crossover(parent1, parent2);
-                if (RandomDouble() < 0.8)
+                if (RandomDouble() < child.getGenome().getNormalisedGenome()[5])
                 {
                     breedMut.WaitOne(); // MUTEX start
                     performDialogue(parent1, child, socialNetwork);
@@ -151,10 +150,14 @@ namespace LanguageEvolution
             double allConnections = 0;
             double AvgWeight = 0;
             double learnRateSum = 0;
+            double totalVocLen = 0;
+            double speakToParentsGene = 0;
             foreach (Agent a in population)
             {
                 double agentsAvgWeight = 0;
                 double agentsConnections = 0;
+                speakToParentsGene += a.getGenome().getNormalisedGenome()[5];
+                totalVocLen += a.getVocabulary().getVocabulary().Count;
                 List<double> normGenome = a.getGenome().getNormalisedGenome();
                 learnRateSum += (normGenome[0] + normGenome[8] + normGenome[9] - normGenome[4] - normGenome[1] - normGenome[7]);
                 if (socialNetwork.getAgentsConnections(a) != null && socialNetwork.getAgentsConnections(a).Count > 0)
@@ -174,9 +177,15 @@ namespace LanguageEvolution
                     }
                 }
             }
+            Console.WriteLine("Speak to parents gene: " + (speakToParentsGene / population.Count));
+            Console.WriteLine("average vocabulary length: " + (totalVocLen / population.Count));
+            Console.WriteLine("Fittest agent: " + population[0].getFitness());
             Console.WriteLine("Average connections: " + (allConnections / population.Count));
             Console.WriteLine("Agents average weight: " + (AvgWeight / population.Count));
             Console.WriteLine("Average learn rate: " + (learnRateSum / population.Count) + "\n\n");
+            d.addSpeakToParentsGenome((speakToParentsGene / population.Count));
+            d.addAvgVocLen((totalVocLen / population.Count));
+            d.addFittest(population[0].getFitness());
             d.setDegree(allConnections / population.Count);
             d.addLearnRate((learnRateSum / population.Count));
         }
@@ -277,7 +286,7 @@ namespace LanguageEvolution
 
             List<Agent> deadAgents = new List<Agent>();
             List<Agent> survivingAgents = new List<Agent>();
-            while(survivingAgents.Count < k)
+            while(survivingAgents.Count < populationSize*k)
             {
                 int i = RandomInt(0, population.Count);
                 survivingAgents.Add(population[i]);
@@ -288,10 +297,17 @@ namespace LanguageEvolution
             //Console.WriteLine("\n\npopSize: " + populationSize + "population: " + sortedList.Count);
             sortedList.Reverse();
             //Console.WriteLine("fitnesses: " + sortedList[0].getFitness() + "  " + sortedList[sortedList.Count - 1].getFitness());
-            //deadAgents = sortedList.GetRange(populationSize, childrenToMake);
             removeDeadAgents(socialNetwork, population, populationSize);
 
-            return sortedList.GetRange(0, n);
+            List<Agent> survivors = new List<Agent>();
+            int counter = 0;
+            while(counter < sortedList.Count * n)
+            {
+                survivors.Add(sortedList[counter]);
+                counter++;
+            }
+            //Console.WriteLine("Number of survivors: "+ survivors.Count);
+            return survivors;
         }
 
         private void removeDeadAgents(SocialNetwork socialNetwork, List<Agent> deadAgents, int populationSize)
@@ -318,9 +334,10 @@ namespace LanguageEvolution
 
         public Agent tournamentSelection(List<Agent> allAgents)
         {
-            List<Agent> pool = new List<Agent>(k);
+            int poolsize = 20;
+            List<Agent> pool = new List<Agent>(poolsize);
             int numberOfAgents = allAgents.Count;
-            while (pool.Count < 8)
+            while (pool.Count < poolsize)
             {
                 int i = RandomInt(0, numberOfAgents);
                 if (!pool.Contains(allAgents[i]))

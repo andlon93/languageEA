@@ -235,8 +235,8 @@ namespace UnitTests
             a.updatepersonality(b, true);
             b.updatepersonality(a, true);
 
-            Assert.AreEqual(1.75, b.getGenome().getValuesGenome()[0]);
-            Assert.AreEqual(1.5, a.getGenome().getValuesGenome()[0]);
+            Assert.AreEqual(2, b.getGenome().getValuesGenome()[0]);
+            Assert.AreEqual(1, a.getGenome().getValuesGenome()[0]);
         }
 
         [TestMethod]

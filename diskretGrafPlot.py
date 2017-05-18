@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 file1 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph1.txt"
+file5 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph5.txt"
 file10 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph10.txt"
 file20 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph20.txt"
 file30 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph30.txt"
@@ -35,11 +36,11 @@ def plotting(file, gen):
     pos=nx.spring_layout(G) # positions for all nodes
 
     # nodes
-    nx.draw_networkx_nodes(G,pos,node_size=100)
+    nx.draw_networkx_nodes(G,pos,node_size=10)
 
     # edges
     nx.draw_networkx_edges(G,pos,edgelist=elarge,
-                        width=1)
+                        width=0.2)
 
     # labels
     #nx.draw_networkx_labels(G,pos,font_size=20,font_family='sans-serif')
@@ -48,14 +49,14 @@ def plotting(file, gen):
     plt.savefig("Data/graph"+gen+".png") # save as png
     plt.show() # display
 
-plotting(file1, '1')
-plotting(file10, '10')
+#plotting(file1, '1')
+plotting(file5, '5')
 plotting(file20, '20')
-plotting(file30, '30')
-plotting(file40, '40')
-plotting(file50, '50')
+#plotting(file30, '30')
+#plotting(file40, '40')
+#plotting(file50, '50')
 plotting(file60, '60')
-plotting(file70, '70')
+#plotting(file70, '70')
 plotting(file80, '80')
-plotting(file90, '90')
+#plotting(file90, '90')
 plotting(file100, '100')

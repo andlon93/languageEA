@@ -5,8 +5,8 @@ namespace LanguageEvolution
 {
     public class Dialogue
     {
-        public double C = 0.25;
-        private int maxExtroConv = 7;
+        public double C = 0.10;
+        //private int maxExtroConv = 7;
 
         public Dialogue()
         {
@@ -39,7 +39,7 @@ namespace LanguageEvolution
             double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
             Dictionary<Agent, double> connections = net.getAgentsConnections(agent);
             //if ((EALoop.RandomDouble() <= P_extrovert && agent.getZ() < maxExtroConv) || net.getAgentsConnections(agent) == null)
-            if ((EALoop.RandomDouble() <= P_extrovert && agent.getZ() < maxExtroConv) || net.getAgentsConnections(agent) == null) 
+            if (EALoop.RandomDouble() <= P_extrovert || net.getAgentsConnections(agent) == null) 
             {
                 // Extrovert
                 Agent listener = population[EALoop.RandomInt(0, population.Count)];

@@ -10,15 +10,26 @@ namespace LanguageEvolution
         private List<double> dialogues;
         private List<double> degree;
         private List<double> learnRate;
+        private List<double> Fittest;
+        private List<double> avgVocLen;
+        private List<double> speakToParentsGene;
         public DataCollector()
         {
+            speakToParentsGene = new List<double>();
+            avgVocLen = new List<double>();
+            Fittest = new List<double>();
             learnRate = new List<double>();
             uniqueWords = new List<int>();
             degree = new List<double>();
             averageFitness = new List<double>();
             dialogues = new List<double>();
         }
-
+        public void addSpeakToParentsGenome(double d) { speakToParentsGene.Add(d); }
+        public List<double> getSpeakToParentsGenome() { return speakToParentsGene; }
+        public void addAvgVocLen(double d) { avgVocLen.Add(d); }
+        public List<double> getAvgVocLen() { return avgVocLen; }
+        public List<double> getFittest() { return Fittest; }
+        public void addFittest(double fitness) { Fittest.Add(fitness); }
         public void addDiscreteGraph(List<Agent> pop, SocialNetwork n, int generation)
         {
             string s = "";
@@ -145,6 +156,27 @@ namespace LanguageEvolution
                 data += d.ToString() + separator;
             }
             System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\LearnRate.txt", data);
+
+            data = "";
+            foreach (double d in Fittest)
+            {
+                data += d.ToString() + separator;
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\MaxFitness.txt", data);
+
+            data = "";
+            foreach (double d in avgVocLen)
+            {
+                data += d.ToString() + separator;
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\avgVocLen.txt", data);
+
+            data = "";
+            foreach (double d in speakToParentsGene)
+            {
+                data += d.ToString() + separator;
+            }
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\SpeakToParents.txt", data);
         }
     }
 }
