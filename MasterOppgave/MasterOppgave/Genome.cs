@@ -75,10 +75,10 @@ namespace LanguageEvolution
         {
             if(EALoop.RandomDouble() <= p)
             {
-                double mutateRate = (EALoop.RandomInt(0,4) - 2) / 10; // Blir et tall mellom -0.2 og 0.2
-                if (mutateRate == 0.0) { mutateRate = 1.01; }
-                int index = EALoop.RandomInt(0,genomeValues.Count);
-                genomeValues[index] = genomeValues[index]*mutateRate;
+                //double mutateRate = (EALoop.RandomInt(0,4) - 2) / 10; // Blir et tall mellom -0.2 og 0.2
+                //if (mutateRate == 0.0) { mutateRate = 1.01; }
+                //int index = EALoop.RandomInt(0,genomeValues.Count);
+                genomeValues[EALoop.RandomInt(0, genomeValues.Count)] = EALoop.RandomInt(0, 100);
                 genomeNormalised = normalise(genomeValues);
             }
         }

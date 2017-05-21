@@ -65,6 +65,7 @@ namespace LanguageEvolution
                 for (int i = 0; i < values.Count; i++)
                 {
                     newValues[i] += (( (partnerValues[i] - values[i]) / getAge() ) * 0.5);
+                    newValues[i] = Math.Max(newValues[i], 100);
                 }
                 double newLR = newValues[0] + newValues[8] + newValues[9] -
                                newValues[4] - newValues[1] - newValues[7];
@@ -79,8 +80,11 @@ namespace LanguageEvolution
                     //values[1] = newValues[1];
                     //values[7] = newValues[7];
                     if (newValues[0] > values[0]) { values[0] = newValues[0]; }
+                    if (newValues[5] > values[5]) { values[5] = newValues[5]; }
+                    if (newValues[3] > values[3]) { values[3] = newValues[3]; }
                     if (newValues[8] > values[8]) { values[8] = newValues[8]; }
                     if (newValues[9] > values[9]) { values[9] = newValues[9]; }
+                    if (newValues[6] < values[6]) { values[6] = newValues[6]; }
                     if (newValues[4] < values[4]) { values[4] = newValues[4]; }
                     if (newValues[1] < values[1]) { values[1] = newValues[1]; }
                     if (newValues[7] < values[7]) { values[7] = newValues[7]; }

@@ -1,19 +1,21 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-file1 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph1.txt"
-file5 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph5.txt"
-file10 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph10.txt"
-file20 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph20.txt"
-file30 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph30.txt"
-file40 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph40.txt"
-file50 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph50.txt"
-file60 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph60.txt"
-file70 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph70.txt"
-file80 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph80.txt"
-file90 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph90.txt"
-file100 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Graph100.txt"
+file1 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph1.txt"
+file5 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph5.txt"
+file6 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph6.txt"
+file10 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph10.txt"
+file20 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph20.txt"
+file30 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph30.txt"
+file40 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph40.txt"
+file50 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph50.txt"
+file60 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph60.txt"
+file70 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph70.txt"
+file80 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph80.txt"
+file90 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph90.txt"
+file100 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph100.txt"
 def plotting(file, gen):
+    print("Generasjon: ", gen)
     opened  = open(file, 'r')
     d = {}
     for line in opened:
@@ -46,14 +48,15 @@ def plotting(file, gen):
     #nx.draw_networkx_labels(G,pos,font_size=20,font_family='sans-serif')
 
     plt.axis('off')
-    plt.savefig("Data/graph"+gen+".png") # save as png
+    plt.savefig("C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/_graph"+gen+".png") # save as png
     plt.show() # display
 
-#plotting(file1, '1')
+plotting(file1, '1')
 plotting(file5, '5')
+#plotting(file6, '6')
+plotting(file10, '10')
 plotting(file20, '20')
-#plotting(file30, '30')
-#plotting(file40, '40')
+plotting(file40, '40')
 #plotting(file50, '50')
 plotting(file60, '60')
 #plotting(file70, '70')

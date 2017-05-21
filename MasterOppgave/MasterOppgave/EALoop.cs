@@ -10,18 +10,18 @@ namespace LanguageEvolution
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
         public int AgentIdCounter = 0;
-        public static int populationSize = 1000;
+        public static int populationSize = 100;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
         public double k = 0.9;
         public double n = 0.8;
         public double eps = 0.2;
         public static int d = 1;
-        public static int Totalgenerations = 150;
+        public static int Totalgenerations = 100;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
         public double succcessfullDialogues = 0;
-        public static double alpha = 0.25; public static double beta = 0.5; public static double gamma = -0.05;
+        public static double alpha = 0.4; public static double beta = 0.5; public static double gamma = -0.05;
         
         static void Main(string[] args)
         {
@@ -39,8 +39,16 @@ namespace LanguageEvolution
                 population.Add(new Agent(ea.AgentIdCounter));
                 ea.AgentIdCounter++;
             }
-            //Console.WriteLine("size of population: " + population.Count);
-            ea.dialogueThreads(socialNetwork, population);
+            List<Agent> speakerPool = new List<Agent>();
+            foreach (Agent a in population)
+            {
+                if (socialNetwork.getAgentsConnections(a) != null)
+                {
+                    speakerPool.Add(a);
+                }
+            }
+            Console.WriteLine("Speaker pool: " + speakerPool.Count);
+            ea.dialogueThreads(socialNetwork, speakerPool, population);
 
             ea.fitnessOfPopulation(population, socialNetwork);
 
@@ -62,12 +70,22 @@ namespace LanguageEvolution
                 //Console.WriteLine("Nodes in the socialnetwork: " + socialNetwork.socialNetwork.Count);
 
                 //--   MAKE CHILDREN   --//
-                Console.WriteLine("Size of population before children is made: " + population.Count);
+                //Console.WriteLine("Size of population before children is made: " + population.Count);
                 population.AddRange(ea.makeChildren(population, socialNetwork));
-                Console.WriteLine("Size of population after children was made: " + population.Count);
+                //Console.WriteLine("Size of population after children was made: " + population.Count);
 
                 //--    PERFORM DIALOGUES   --//
-                ea.dialogueThreads(socialNetwork, population);
+                //Console.WriteLine("socialnetwork count  "+socialNetwork.socialNetwork.Count);
+                speakerPool = new List<Agent>();
+                foreach (Agent a in population)
+                {
+                    if (socialNetwork.getAgentsConnections(a) != null)
+                    {
+                        speakerPool.Add(a);
+                    }
+                }
+                Console.WriteLine("Speaker pool: " + speakerPool.Count);
+                ea.dialogueThreads(socialNetwork, speakerPool, population);
                 
                 //ea.succcessfullDialogues = 0;
                 //Console.WriteLine("Dialogues performed");
@@ -133,10 +151,16 @@ namespace LanguageEvolution
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
                 Agent child = crossover(parent1, parent2);
-                if (RandomDouble() < child.getGenome().getNormalisedGenome()[5])
+                if (RandomDouble() <= (child.getGenome().getNormalisedGenome()[5]*2))
                 {
                     breedMut.WaitOne(); // MUTEX start
                     performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork);
+                    performDialogue(parent2, child, socialNetwork);
+                    performDialogue(parent1, child, socialNetwork); 
                     performDialogue(parent2, child, socialNetwork);
                     breedMut.ReleaseMutex(); // MUTEX end
                 }
@@ -147,16 +171,20 @@ namespace LanguageEvolution
 
         private void addFitnessDegreeData(List<Agent> population, SocialNetwork socialNetwork, DataCollector d)
         {
+            double C = 0.25;
             double allConnections = 0;
             double AvgWeight = 0;
             double learnRateSum = 0;
             double totalVocLen = 0;
             double speakToParentsGene = 0;
+            double extrovertProb = 0;
             foreach (Agent a in population)
             {
                 double agentsAvgWeight = 0;
                 double agentsConnections = 0;
                 speakToParentsGene += a.getGenome().getNormalisedGenome()[5];
+                List<double> genome = a.getGenome().getValuesGenome();
+                extrovertProb += ((genome[3] + (100 - genome[6]) / 200) * C)/100;
                 totalVocLen += a.getVocabulary().getVocabulary().Count;
                 List<double> normGenome = a.getGenome().getNormalisedGenome();
                 learnRateSum += (normGenome[0] + normGenome[8] + normGenome[9] - normGenome[4] - normGenome[1] - normGenome[7]);
@@ -173,16 +201,18 @@ namespace LanguageEvolution
                     if (agentsConnections > 0)
                     {
                         AvgWeight += (agentsAvgWeight / agentsConnections);
-                        allConnections += agentsConnections / 2;
+                        allConnections += agentsConnections;
                     }
                 }
             }
             Console.WriteLine("Speak to parents gene: " + (speakToParentsGene / population.Count));
+            Console.WriteLine("Extrovert probability: " + (extrovertProb / population.Count));
             Console.WriteLine("average vocabulary length: " + (totalVocLen / population.Count));
             Console.WriteLine("Fittest agent: " + population[0].getFitness());
             Console.WriteLine("Average connections: " + (allConnections / population.Count));
             Console.WriteLine("Agents average weight: " + (AvgWeight / population.Count));
             Console.WriteLine("Average learn rate: " + (learnRateSum / population.Count) + "\n\n");
+            d.addExtrovertData((extrovertProb / population.Count));
             d.addSpeakToParentsGenome((speakToParentsGene / population.Count));
             d.addAvgVocLen((totalVocLen / population.Count));
             d.addFittest(population[0].getFitness());
@@ -203,12 +233,12 @@ namespace LanguageEvolution
             population.Reverse();
         }
 
-        public void dialogueThreads(SocialNetwork socialNetwork, List<Agent> population)
+        public void dialogueThreads(SocialNetwork socialNetwork, List<Agent> speakerPool, List<Agent> population)
         {
             List<Thread> ts = new List<Thread>();
             for (int i = 0; i < population.Count*d; i++)
             {
-                Thread t = new Thread(new ThreadStart(() => performDialogues(socialNetwork, population)));
+                Thread t = new Thread(new ThreadStart(() => performDialogues(socialNetwork, speakerPool, population)));
                 t.Name = String.Format("t{0}", i + 1);
                 t.Start();
                 ts.Add(t);
@@ -219,11 +249,21 @@ namespace LanguageEvolution
             }
         }
 
-        public void performDialogues(SocialNetwork socialNetwork, List<Agent> population)
+        public void performDialogues(SocialNetwork socialNetwork, List<Agent> speakerPool, List<Agent> population)
         {
             Dialogue dialogue = new Dialogue();
-            Agent speaker = dialogue.selectSpeaker(population);
-            Agent listener = dialogue.selectListener(speaker, socialNetwork, population);
+            Agent speaker; Agent listener;
+            if (speakerPool.Count == 0)
+            {
+                speaker = population[RandomInt(0, population.Count)];
+                listener = population[RandomInt(0, population.Count)];
+            }
+            else
+            {
+                speaker = dialogue.selectSpeaker(speakerPool);
+                listener = dialogue.selectListener(speaker, socialNetwork, population);
+            }
+
             if (listener == null)
             {
                 while (listener == null || listener == speaker)

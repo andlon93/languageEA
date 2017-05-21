@@ -5,7 +5,7 @@ namespace LanguageEvolution
 {
     public class Dialogue
     {
-        public double C = 0.10;
+        public double C = 0.25;
         //private int maxExtroConv = 7;
 
         public Dialogue()
@@ -16,16 +16,16 @@ namespace LanguageEvolution
         public Agent selectSpeaker(List<Agent> pop)
         {
             double sum = 0;
-            foreach(Agent a in pop)
+            foreach (Agent a in pop)
             {
                 sum += a.getFitness();
             }
             double rnd = EALoop.RandomDouble();
             double n = 0;
-            foreach(Agent a in pop)
+            foreach (Agent a in pop)
             {
                 n += a.getFitness() / sum;
-                if(rnd <= n)
+                if (rnd <= n)
                 {
                     return a;
                 }
@@ -36,12 +36,13 @@ namespace LanguageEvolution
         public Agent selectListener(Agent agent, SocialNetwork net, List<Agent> population)
         {
             var genome = agent.getGenome().getValuesGenome();
-            double P_extrovert = (genome[3] + genome[4] + (200 - genome[5] - genome[6]) / 400) * C;
+            double P_extrovert = ((genome[3] + (100 - genome[6]) / 200) * C)/100;
             Dictionary<Agent, double> connections = net.getAgentsConnections(agent);
             //if ((EALoop.RandomDouble() <= P_extrovert && agent.getZ() < maxExtroConv) || net.getAgentsConnections(agent) == null)
-            if (EALoop.RandomDouble() <= P_extrovert || net.getAgentsConnections(agent) == null) 
+            if (EALoop.RandomDouble() <= P_extrovert) 
             {
                 // Extrovert
+                //System.Console.WriteLine("EXTROVERT");
                 Agent listener = population[EALoop.RandomInt(0, population.Count)];
                 while (listener == agent)
                 {
