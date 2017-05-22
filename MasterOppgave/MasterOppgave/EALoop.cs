@@ -10,7 +10,7 @@ namespace LanguageEvolution
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
         public int AgentIdCounter = 0;
-        public static int populationSize = 100;
+        public static int populationSize = 10000;
         public static int numThreads = populationSize;
         public static Double mutationProb = 0.01;
         public double k = 0.9;
@@ -51,9 +51,7 @@ namespace LanguageEvolution
             ea.dialogueThreads(socialNetwork, speakerPool, population);
 
             ea.fitnessOfPopulation(population, socialNetwork);
-
             population = ea.survivalSelection(population, socialNetwork);
-
             data.addDiscreteGraph(population, socialNetwork, generations);
             data.addFitnessData(population);
             data.setDialogues(population);
@@ -77,11 +75,13 @@ namespace LanguageEvolution
                 //--    PERFORM DIALOGUES   --//
                 //Console.WriteLine("socialnetwork count  "+socialNetwork.socialNetwork.Count);
                 speakerPool = new List<Agent>();
-                foreach (Agent a in population)
+                for (int q = 0; q < population.Count; q++)
                 {
-                    if (socialNetwork.getAgentsConnections(a) != null)
+                    //Console.WriteLine("index: " + q);
+                    if(population[q] == null) { population.RemoveAt(q); }
+                    else if(socialNetwork.getAgentsConnections(population[q]) != null && socialNetwork.getAgentsConnections(population[q]).Count > 0)
                     {
-                        speakerPool.Add(a);
+                        speakerPool.Add(population[q]);
                     }
                 }
                 Console.WriteLine("Speaker pool: " + speakerPool.Count);
@@ -92,7 +92,7 @@ namespace LanguageEvolution
 
                 //--    CALCULATE FITNESS   --//
                 ea.fitnessOfPopulation(population, socialNetwork);
-                
+
 
                 //--    SURVIVAL SELECTION   --//
                 population = ea.survivalSelection(population, socialNetwork);
@@ -225,9 +225,17 @@ namespace LanguageEvolution
 
             foreach (Agent a in population)
             {
-                double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
+                if(a != null && socialNetwork.getAgentsConnections(a) != null)
+                {
+                    double fitness = a.calculateFitness(socialNetwork.getAgentsConnections(a));
+                    a.setFitness(fitness);
+                }
+                else
+                {
+                    a.setFitness(0);
+                }
                 //Console.WriteLine("Vocabulary size: "+ a.getVocabulary().getVocabulary().Count + "\nFitness: "+ fitness+"\n");
-                a.setFitness(fitness);
+                
             }
             population = population.OrderBy(agent => agent.getFitness()).ToList();
             population.Reverse();
@@ -251,6 +259,7 @@ namespace LanguageEvolution
 
         public void performDialogues(SocialNetwork socialNetwork, List<Agent> speakerPool, List<Agent> population)
         {
+            diaMut.WaitOne();
             Dialogue dialogue = new Dialogue();
             Agent speaker; Agent listener;
             if (speakerPool.Count == 0)
@@ -272,6 +281,7 @@ namespace LanguageEvolution
                 }
             }
             performDialogue(speaker, listener, socialNetwork);
+            diaMut.ReleaseMutex();
         }
 
         private void performDialogue(Agent speaker, Agent listener, SocialNetwork socialNetwork)
@@ -280,7 +290,6 @@ namespace LanguageEvolution
             string utterance = dialogue.utterWord(speaker);
             bool isSuccess = false;
 
-            diaMut.WaitOne(); 
             if (!(listener.getVocabulary().getVocabulary() == null) && listener.getVocabulary().getVocabulary().ContainsKey(utterance))
             {
                 isSuccess = true;
@@ -305,7 +314,6 @@ namespace LanguageEvolution
 
             socialNetwork.setConnection(speaker, listener, getWeight(speaker, isSuccess));
             socialNetwork.setConnection(listener, speaker, getWeight(listener, isSuccess));
-            diaMut.ReleaseMutex();
         }
 
         public double getWeight(Agent a, bool isSuccess)

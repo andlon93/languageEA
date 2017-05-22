@@ -1,19 +1,19 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-file1 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph1.txt"
-file5 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph5.txt"
-file6 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph6.txt"
-file10 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph10.txt"
-file20 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph20.txt"
-file30 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph30.txt"
-file40 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph40.txt"
-file50 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph50.txt"
-file60 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph60.txt"
-file70 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph70.txt"
-file80 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph80.txt"
-file90 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph90.txt"
-file100 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph100.txt"
+file1 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph1.txt"
+file5 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph5.txt"
+file6 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph6.txt"
+file10 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph10.txt"
+file20 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph20.txt"
+file30 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph30.txt"
+file40 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph40.txt"
+file50 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph50.txt"
+file60 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph60.txt"
+file70 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph70.txt"
+file80 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph80.txt"
+file90 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph90.txt"
+file100 = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph100.txt"
 def plotting(file, gen):
     print("Generasjon: ", gen)
     opened  = open(file, 'r')

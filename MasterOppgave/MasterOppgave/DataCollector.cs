@@ -45,7 +45,7 @@ namespace LanguageEvolution
                 {
                     foreach (var b in n.getAgentsConnections(a))
                     {
-                        if ( b.Value > 0.0 && !(addedEdges.Contains(a.getID().ToString() + b.Key.getID().ToString())) )
+                        if ( b.Value >= 0.0 )//&& !(addedEdges.Contains(a.getID().ToString() + b.Key.getID().ToString())) )
                         {
                             s += b.Key.getID().ToString() + sep;
                             addedEdges.Add(a.getID().ToString() + b.Key.getID().ToString());
@@ -54,7 +54,7 @@ namespace LanguageEvolution
                     s += "\n";
                 }
             }
-            string filename = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 2/Graph" + generation.ToString()+".txt";
+            string filename = "C:/Users/andrl/Desktop/masterStuff/MasterData/Figures/Experiment 3/Graph" + generation.ToString()+".txt";
             System.IO.File.WriteAllText(@filename, s);
         }
 
@@ -130,56 +130,56 @@ namespace LanguageEvolution
             {
                 data += f.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\FitnessData.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\FitnessData.txt", data);
 
             data = "";
             foreach(double d in dialogues)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\DialogueData.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\DialogueData.txt", data);
 
             data = "";
             foreach (double d in degree)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\DegreeData.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\DegreeData.txt", data);
 
             data = "";
             foreach (int d in uniqueWords)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\UniqueWordsData.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\UniqueWordsData.txt", data);
 
             data = "";
             foreach (double d in learnRate)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\LearnRate.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\LearnRate.txt", data);
 
             data = "";
             foreach (double d in Fittest)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\MaxFitness.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\MaxFitness.txt", data);
 
             data = "";
             foreach (double d in avgVocLen)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\avgVocLen.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\avgVocLen.txt", data);
 
             data = "";
             foreach (double d in speakToParentsGene)
             {
                 data += d.ToString() + separator;
             }
-            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 2\SpeakToParents.txt", data);
+            System.IO.File.WriteAllText(@"C:\Users\andrl\Desktop\masterStuff\MasterData\Figures\Experiment 3\SpeakToParents.txt", data);
 
             data = "";
             foreach (double d in extrovert)
