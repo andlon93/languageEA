@@ -5,7 +5,7 @@ namespace LanguageEvolution
 {
     public class Dialogue
     {
-        public double C = 0.25;
+        public double C = 0.5;
         //private int maxExtroConv = 7;
 
         public Dialogue()
@@ -73,7 +73,10 @@ namespace LanguageEvolution
         public string utterWord(Agent speaker)
         {
             Dictionary<string, double> vocabulary = speaker.getVocabulary().getVocabulary();
-            
+            if (EALoop.RandomInt(0, 100) <= 40)
+            {
+                return newWord();
+            }
             if (vocabulary.Count == 0)
             {
                 return newWord(); 

@@ -49,10 +49,10 @@ namespace LanguageEvolution
             }
             //Console.WriteLine("sum of all weights: " + sumOfAllWeights + "\nWmax: " + wMax + "\nNumber of connections: " + numConnections + "\n number strong weights: " + NStrongWeights + "\n N: " + N + "\nAge factor: " + Math.Exp(-0.05 * getAge()));
             if (numConnections == 0) { return 0; }
-            double weightFitness = Math.Min(Math.Exp( (EALoop.alpha * sumOfAllWeights)) -1, 1);
-            double degreeFitness = Math.Min(Math.Exp(EALoop.beta * NStrongWeights) - 1, 1);
+            double weightFitness = Math.Exp( (EALoop.alpha * sumOfAllWeights)) -1;
+            double degreeFitness = Math.Exp(EALoop.beta * (NStrongWeights/numStrongConnections)) - 1;
             double ageFitness = Math.Exp(EALoop.gamma * getAge()) ;
-            return Math.Min(weightFitness*degreeFitness*ageFitness, 1);
+            return Math.Min(weightFitness * degreeFitness * ageFitness, 1);
         }
 
         public void updatepersonality(Agent partner, bool isSuccess)

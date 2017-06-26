@@ -10,19 +10,19 @@ namespace LanguageEvolution
         Mutex breedMut = new Mutex();
         Mutex diaMut = new Mutex();
         public int AgentIdCounter = 0;
-        public static int populationSize = 10000;
+        public static int populationSize = 1000;
         public static int numThreads = populationSize;
-        public static Double mutationProb = 0.01;
+        public static Double mutationProb = 0.02;
         public double k = 0.9;
-        public double n = 0.8;
+        public double n = 0.5;
         public double eps = 0.2;
         public static int d = 1;
         public static int Totalgenerations = 100;
         public static readonly Random random = new Random();
         public static readonly object syncLock = new object();
         public double succcessfullDialogues = 0;
-        public static double alpha = 0.4; public static double beta = 0.5; public static double gamma = -0.05;
-        
+        public static double alpha = 0.2; public static double beta = 0.12; public static double gamma = -0.05;
+        public static double speakToParentsConstant = 3;
         static void Main(string[] args)
         {
             EALoop ea = new EALoop();
@@ -101,7 +101,7 @@ namespace LanguageEvolution
                 data.setDialogues(population);
                 data.setUniqueWords(population);
                 data.addFitnessData(population);
-                data.addDiscreteGraph(population, socialNetwork, generations);
+                if (generations % 5 == 0) { data.addDiscreteGraph(population, socialNetwork, generations); }
                 ea.addFitnessDegreeData(population, socialNetwork, data);
 
                 ea.updateAges(population);
@@ -151,7 +151,7 @@ namespace LanguageEvolution
                 Agent parent1 = tournamentSelection(pop);
                 Agent parent2 = tournamentSelection(pop);
                 Agent child = crossover(parent1, parent2);
-                if (RandomDouble() <= (child.getGenome().getNormalisedGenome()[5]*2))
+                if (RandomDouble() <= (child.getGenome().getNormalisedGenome()[5]*speakToParentsConstant))
                 {
                     breedMut.WaitOne(); // MUTEX start
                     performDialogue(parent1, child, socialNetwork);
@@ -160,7 +160,7 @@ namespace LanguageEvolution
                     performDialogue(parent2, child, socialNetwork);
                     performDialogue(parent1, child, socialNetwork);
                     performDialogue(parent2, child, socialNetwork);
-                    performDialogue(parent1, child, socialNetwork); 
+                    performDialogue(parent1, child, socialNetwork);
                     performDialogue(parent2, child, socialNetwork);
                     breedMut.ReleaseMutex(); // MUTEX end
                 }
@@ -171,7 +171,7 @@ namespace LanguageEvolution
 
         private void addFitnessDegreeData(List<Agent> population, SocialNetwork socialNetwork, DataCollector d)
         {
-            double C = 0.25;
+            double C = 0.5;
             double allConnections = 0;
             double AvgWeight = 0;
             double learnRateSum = 0;
@@ -182,7 +182,7 @@ namespace LanguageEvolution
             {
                 double agentsAvgWeight = 0;
                 double agentsConnections = 0;
-                speakToParentsGene += a.getGenome().getNormalisedGenome()[5];
+                speakToParentsGene += a.getGenome().getNormalisedGenome()[5]* speakToParentsConstant;
                 List<double> genome = a.getGenome().getValuesGenome();
                 extrovertProb += ((genome[3] + (100 - genome[6]) / 200) * C)/100;
                 totalVocLen += a.getVocabulary().getVocabulary().Count;
@@ -205,7 +205,7 @@ namespace LanguageEvolution
                     }
                 }
             }
-            Console.WriteLine("Speak to parents gene: " + (speakToParentsGene / population.Count));
+            Console.WriteLine("Speak to parents prob: " + (speakToParentsGene / population.Count));
             Console.WriteLine("Extrovert probability: " + (extrovertProb / population.Count));
             Console.WriteLine("average vocabulary length: " + (totalVocLen / population.Count));
             Console.WriteLine("Fittest agent: " + population[0].getFitness());
@@ -264,11 +264,13 @@ namespace LanguageEvolution
             Agent speaker; Agent listener;
             if (speakerPool.Count == 0)
             {
+                //Console.WriteLine("forced extrovert");
                 speaker = population[RandomInt(0, population.Count)];
                 listener = population[RandomInt(0, population.Count)];
             }
             else
             {
+                //Console.WriteLine("Introvert");
                 speaker = dialogue.selectSpeaker(speakerPool);
                 listener = dialogue.selectListener(speaker, socialNetwork, population);
             }
@@ -277,6 +279,7 @@ namespace LanguageEvolution
             {
                 while (listener == null || listener == speaker)
                 {
+                    Console.WriteLine("new listener");
                     listener = population[RandomInt(0, population.Count)];
                 }
             }
@@ -302,6 +305,7 @@ namespace LanguageEvolution
             }
             else
             {
+                
                 double i = speaker.getGenome().getNormalisedGenome()[0] + speaker.getGenome().getNormalisedGenome()[8] + speaker.getGenome().getNormalisedGenome()[9] - speaker.getGenome().getNormalisedGenome()[4] - speaker.getGenome().getNormalisedGenome()[1] - speaker.getGenome().getNormalisedGenome()[7];
                 double i2 = listener.getGenome().getNormalisedGenome()[0] + listener.getGenome().getNormalisedGenome()[8] + listener.getGenome().getNormalisedGenome()[9] - listener.getGenome().getNormalisedGenome()[4] - listener.getGenome().getNormalisedGenome()[1] - listener.getGenome().getNormalisedGenome()[7];
                 speaker.updateDialogs(false);
